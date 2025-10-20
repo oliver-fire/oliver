@@ -1,0 +1,23 @@
+.icon {
+    padding: $spacing-8;
+    border-radius: $radius-12;
+
+    background: none;
+    border: none;
+    
+    cursor: pointer;
+
+    &:hover {
+        background-color: $background-hover;
+    }
+
+    svg {
+        color: $content-weak;
+    }
+
+    &.primary {
+        svg {
+            color: $content;
+        }
+    }
+}
