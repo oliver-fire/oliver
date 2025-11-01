@@ -1,14 +1,7 @@
 .card {
-    border: 1px solid $border;
-    border-radius: $radius-12;
-
     display: flex;
     flex-direction: column;
     gap: $spacing-12;
-
-    &.paddingOn {
-        padding: $spacing-16;
-    }
 }
 
 .title {

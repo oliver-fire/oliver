@@ -1,0 +1,79 @@
+@import "@/shared/styles/variables.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-16;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 500;
+  color: $content;
+  margin: 0;
+}
+
+.buttonGroup {
+  display: flex;
+ 
+  background-color: $background;
+  border-radius: $radius-8;
+}
+
+.button {
+  flex: 1;
+  height: 42px;
+  
+  background-color: transparent;
+  border: none;
+  border-radius: $radius-6;
+  
+  font-size: 14px;
+  font-weight: 500;
+  color: $content-weak;
+  
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  
+  &.active {
+    background-color: $background-strong;
+    border-color: $border-base;
+    color: $content;
+  }
+}
+
+.phoneInput {
+  display: flex;
+  align-items: center;
+  gap: $spacing-12;
+  
+  padding: 0 $spacing-16;
+  height: 56px;
+  
+  background-color: $background;
+  border: 1px solid $border;
+  border-radius: $radius-8;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: $content-weak;
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  
+  font-size: 16px;
+  color: $content;
+  
+  &::placeholder {
+    color: $content-weak;
+  }
+}
+

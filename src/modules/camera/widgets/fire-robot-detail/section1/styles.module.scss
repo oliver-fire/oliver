@@ -1,0 +1,318 @@
+.fireRobotDetail {
+  width: min(600px, 90vw);
+  max-width: 700px;
+  min-width: 400px;
+  height: calc(100vh - 32px);
+  background: #fff;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+
+  @media (max-width: 768px) {
+    width: 95vw;
+    min-width: 320px;
+  }
+
+  @media (min-width: 1920px) {
+    width: 650px;
+  }
+}
+
+// 상단: 헤더 섹션
+.topSection {
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #111827;
+}
+
+.titleInput {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 6px 12px;
+  outline: none;
+  transition: border-color 0.2s;
+  min-width: 200px;
+}
+
+.editButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  flex-shrink: 0;
+
+  &:hover {
+    color: #6b7280;
+  }
+}
+
+.subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.closeButton {
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 4px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  flex-shrink: 0;
+
+}
+
+// 중간: 콘텐츠 섹션
+.middleSection {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+// 하단: 삭제 버튼 섹션
+.bottomSection {
+  padding: 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.deleteButton {
+  width: 113px;
+  height: 32px;
+  padding: 8px 12px;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  &:hover {
+    background: #dc2626;
+  }
+
+  &:active {
+    background: #b91c1c;
+  }
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.infoCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+
+  &:nth-child(5) {
+    grid-column: 1 / -1;
+  }
+}
+
+.infoCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.infoIcon {
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.value {
+  font-size: 14px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.cameraSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cameraEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  background: #f9fafb;
+  border-radius: 8px;
+  text-align: center;
+  gap: 8px;
+}
+
+.emptyMessage {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.emptyDescription {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.locationSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.locationIcon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 8px;
+  color: #9ca3af;
+}
+
+.locationInfo {
+  flex: 1;
+}
+
+.locationEmpty {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.keyRecordSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recordDate {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.recordItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.recordIcon {
+  flex-shrink: 0;
+}
+
+.recordLabel {
+  font-size: 18px;
+  color: #111827;
+  font-weight: 500;
+}
+
+// 스크롤바 스타일링
+.middleSection::-webkit-scrollbar {
+  width: 6px;
+}
+
+.middleSection::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.middleSection::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+
+  &:hover {
+    background: #9ca3af;
+  }
+}
+

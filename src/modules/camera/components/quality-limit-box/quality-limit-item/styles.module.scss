@@ -1,0 +1,31 @@
+.container {
+    min-width: 105px;
+    min-height: 41px;
+    border-radius: 12px;
+    border: 1px solid $border;
+    padding-left: 10px;
+    padding-right: 12px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &.selected {
+        background-color: #3875D8;
+        border-color: #3875D8;
+        
+        p {
+            color: #FFF;
+        }
+    }
+}
+
+p{
+    color: #8B8B8B;
+    font-family: Pretendard;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    transition: color 0.2s ease;
+}

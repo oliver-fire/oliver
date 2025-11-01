@@ -1,0 +1,53 @@
+@import "@/shared/styles/variables.scss";
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-8;
+  
+  height: 48px;
+  padding: 0 $spacing-24;
+  
+  border: none;
+  border-radius: $radius-8;
+  
+  font-size: 15px;
+  font-weight: 500;
+  
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.primary {
+  background-color: $button-background;
+  color: $content-invert;
+  
+  &:hover {
+    background-color: #2a2a2a;
+  }
+}
+
+.secondary {
+  background-color: $background-strong;
+  color: $content;
+  
+  &:hover {
+    background-color: #e5e5e5;
+  }
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.text {
+  white-space: nowrap;
+}
+

@@ -1,16 +1,20 @@
 import { CameraInfoSection, VideoSection } from "@/modules/camera/widgets";
+import { NoCameraInfoSection } from "@/modules/camera/widgets/camera-info-section";
 import MainLayout from "@/shared/components/main-layout";
-import { Header, Sidebar } from "@/shared/widgets";
+import { useState } from "react";
 
 export default function Camera() {
+  const [isCameraInfo, setIsCameraInfo] = useState(true);
   return (
-    <div>
-      <Header />
-      <MainLayout>
-        <Sidebar />
-        <CameraInfoSection />
-        <VideoSection />
-      </MainLayout>
-    </div>
+    <MainLayout row>
+      {isCameraInfo ? (
+        <>
+          <CameraInfoSection />
+          <VideoSection />
+        </>
+      ) : (
+        <NoCameraInfoSection />
+      )}
+    </MainLayout>
   );
 }

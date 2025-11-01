@@ -1,42 +1,47 @@
-import { Box, ChartPie, Layers2, RefreshCcw, Video } from "lucide-react";
+import { Box, Map, Settings, Video } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
+import SidebarItem from "./siderbar-item";
 import s from "./style.module.scss";
 
-export default function Sidebar() {
+interface Props {
+  isOpen?: boolean;
+}
+
+export default function Sidebar({ isOpen = true }: Props) {
   const pathname = useLocation().pathname;
 
   const isActive = (path: string) => pathname.includes(path);
 
   return (
-    <aside className={s.sidebar}>
+    <aside className={s.sidebar} data-open={isOpen}>
       <ul className={s.menu}>
-        <li data-active={pathname === "/"}>
-          <a href="/">
-            <ChartPie />
-          </a>
-        </li>
-        <li data-active={isActive("/devices")}>
-          <a href="/devices">
-            <Box />
-          </a>
-        </li>
-        <li data-active={isActive("/camera")}>
-          <a href="/camera">
-            <Video />
-          </a>
-        </li>
-        <li data-active={isActive("/check-update")}>
-          <a href="/check-update">
-            <RefreshCcw />
-          </a>
-        </li>
+        <SidebarItem 
+          icon={Box} 
+          text="로봇" 
+          href="/" 
+          isActive={pathname === "/"} 
+        />
+        <SidebarItem 
+          icon={Video} 
+          text="카메라" 
+          href="/camera" 
+          isActive={isActive("/camera")} 
+        />
+        <SidebarItem 
+          icon={Map} 
+          text="지도" 
+          href="/map" 
+          isActive={isActive("/map")} 
+        />
+        <SidebarItem 
+          icon={Settings} 
+          text="설정" 
+          href="/settings" 
+          isActive={isActive("/settings")} 
+        />
         <div className={s.full} />
-        <li data-active={isActive("/reports")}>
-          <a href="/reports">
-            <Layers2 />
-          </a>
-        </li>
+        
       </ul>
     </aside>
   );

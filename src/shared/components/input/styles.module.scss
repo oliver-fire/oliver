@@ -1,0 +1,47 @@
+@import "@/shared/styles/variables.scss";
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-8;
+  width: 100%;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: $content;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required {
+  color: #ff4d4f;
+  font-size: 14px;
+}
+
+.input {
+  width: 100%;
+  height: 48px;
+  padding: 0 $spacing-16;
+  
+  background-color: $background-strong;
+  border: 1px solid $border-base;
+  border-radius: $radius-8;
+  
+  font-size: 14px;
+  color: $content;
+  
+  transition: all 0.2s ease;
+  
+  &::placeholder {
+    color: $content-weak;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: $background-strong
+  }
+}
+

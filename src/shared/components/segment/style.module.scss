@@ -1,27 +1,31 @@
+@import "@/shared/styles/variables.scss";
+
 .segment {
-    background-color: $background-strong;
-
-    padding: $spacing-4;
-
-    border-radius: $radius-12;
-
     display: flex;
+    background-color: $background;
+    border: 1px solid $border-base;
+    border-radius: $radius-8;
 }
 
 .item {
-    width: 100%;
-    padding: $spacing-8 $spacing-12;
-
-    border-radius: $radius-8;
+    flex: 1;
+    height: 42px;
+    
+    background-color: transparent;
     border: none;
-
-    font-size: 16px;
-
+    border-radius: 0;
+    
+    font-size: 14px;
+    font-weight: 500;
+    color: $content;
+    
     cursor: pointer;
-
+    transition: all 0.2s ease;
+    
+    
     &.selected {
-        background-color: $background;
-
-        color: $content-brand;
+        background-color: $background-strong;
+        border-color: $border-base;
+        color: $content;
     }
 }

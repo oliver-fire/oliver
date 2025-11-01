@@ -1,0 +1,47 @@
+@import "@/shared/styles/variables.scss";
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: $spacing-12;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  background-color: $background;
+  border: 2px solid $border;
+  border-radius: $radius-6;
+  
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: $content-weak;
+  }
+  
+  &.checked {
+    background-color: $button-background;
+    border-color: $button-background;
+  }
+}
+
+.checkIcon {
+  width: 16px;
+  height: 16px;
+  color: $content-invert;
+  stroke-width: 3px;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 400;
+  color: $content;
+}
+

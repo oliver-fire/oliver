@@ -1,4 +1,10 @@
+export { default as Alert } from "./alert";
+export { default as Button } from "./butoon";
 export { default as Card } from "./card";
+export { default as Checkbox } from "./checkbox";
+export { default as Contact } from "./Contact";
 export { default as IconButton } from "./icon-button";
+export { default as Input } from "./input";
 export { default as MainLayout } from "./main-layout";
 export { default as Segment } from "./segment";
+export { default as SubHeader } from "./sub-header";

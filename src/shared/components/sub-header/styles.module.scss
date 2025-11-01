@@ -1,0 +1,36 @@
+@import "@/shared/styles/variables.scss";
+
+.subHeader {
+  width: 100%;
+  max-width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 $spacing-32;
+  margin-bottom: 0;
+  background-color: $background;
+  border-bottom: 1px solid $border;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: $spacing-8;
+  font-size: 14px;
+}
+
+.parent {
+  color: $content-weak;
+  font-weight: 400;
+}
+
+.separator {
+  color: $content-weak;
+  font-weight: 400;
+}
+
+.current {
+  color: $content;
+  font-weight: 500;
+}
+

@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { Camera, Home } from "@/pages";
-
+import { Camera, Home, Map, Settings } from "@/pages";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -10,5 +9,13 @@ export const router = createBrowserRouter([
   {
     path: "/camera",
     element: <Camera />,
+  },
+  {
+    path: "/map",
+    element: <Map />,
+  },
+  {
+    path: "/settings",
+    element: <Settings />,
   },
 ]);
