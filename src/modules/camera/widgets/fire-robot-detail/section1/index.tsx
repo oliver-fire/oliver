@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FireRobot, FireSensor } from "@/mok";
 import { Segment } from "@/shared/components";
 import Button from "@/shared/components/butoon";
-import { Pencil, X, Trash2, Wifi, Timer, Calendar, BatteryLow, BatteryFull } from "lucide-react";
+import { Pencil, X, Trash2, Wifi, Timer, Calendar, BatteryLow, BatteryFull, Layers2 } from "lucide-react";
 import s from "./styles.module.scss";
 
 // 로봇 정보 카드 컴포넌트
@@ -86,9 +86,10 @@ interface FireRobotDetailSectionProps {
   robot: FireRobot | FireSensor;
   onClose?: () => void;
   onDelete?: () => void;
+  onMoveBuilding?: () => void;
 }
 
-export default function FireRobotDetailSection({ robot, onClose, onDelete }: FireRobotDetailSectionProps) {
+export default function FireRobotDetailSection({ robot, onClose, onDelete, onMoveBuilding }: FireRobotDetailSectionProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(robot.name);
 
@@ -190,8 +191,14 @@ export default function FireRobotDetailSection({ robot, onClose, onDelete }: Fir
         <KeyRecordSection />
       </div>
 
-      {/* 하단: 삭제 버튼 */}
+      {/* 하단: 버튼들 */}
       <div className={s.bottomSection}>
+        {onMoveBuilding && (
+          <button className={s.moveButton} onClick={onMoveBuilding}>
+            <Layers2 size={16} />
+            건물 이동하기
+          </button>
+        )}
         <button className={s.deleteButton} onClick={onDelete}>
           <Trash2 size={16} />
           로봇 삭제하기

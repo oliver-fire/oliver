@@ -52,16 +52,16 @@
   border-radius: $radius-16;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
 
   &:hover {
     border-color: $content-weak;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
   }
 
   &.selected {
-    border-color: $background-brand;
-    box-shadow: 0 4px 12px rgba(55, 116, 215, 0.2);
+    border-color:#EAEAEA;
+   
   }
 }
 

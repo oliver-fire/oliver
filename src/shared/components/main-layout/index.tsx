@@ -6,9 +6,12 @@ import s from "./style.module.scss";
 interface Props {
   children: React.ReactNode;
   row?: boolean;
+  backgroundVariant?: "default" | "gray";
+  hideSubHeader?: boolean;
+  hideOverflow?: boolean;
 }
 
-export default function MainLayout({ children, row = false }: Props) {
+export default function MainLayout({ children, row = false, backgroundVariant = "default", hideSubHeader = false, hideOverflow = false }: Props) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
@@ -18,9 +21,9 @@ export default function MainLayout({ children, row = false }: Props) {
   return (
     <div className={s.layout}>
       <Header onMenuClick={toggleSidebar} />
-      <SubHeader />
+      {!hideSubHeader && <SubHeader />}
       <div className={s.container}>
-        <main className={`${s.main} ${row ? s.row : ""}`}>{children}</main>
+        <main className={`${s.main} ${row ? s.row : ""} ${backgroundVariant === "gray" ? s.grayBackground : ""} ${hideOverflow ? s.noOverflow : ""}`}>{children}</main>
         {isSidebarOpen && (
           <div className={s.overlay} onClick={toggleSidebar} />
         )}

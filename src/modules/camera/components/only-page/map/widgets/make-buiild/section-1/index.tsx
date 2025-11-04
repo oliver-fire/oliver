@@ -6,9 +6,10 @@ import s from "./styles.module.scss";
 interface MakeBuildProps {
   isOpen: boolean;
   onClose: () => void;
+  onNext?: () => void;
 }
 
-export default function MakeBuild({ isOpen, onClose }: MakeBuildProps) {
+export default function MakeBuild({ isOpen, onClose, onNext }: MakeBuildProps) {
   if (!isOpen) return null;
 
   return (
@@ -39,7 +40,7 @@ export default function MakeBuild({ isOpen, onClose }: MakeBuildProps) {
             text="눌러서 추가하기"
             onClick={() => {
               // TODO: 건물 추가 로직
-              onClose();
+              onNext?.();
             }}
             width={147}
             height={48}

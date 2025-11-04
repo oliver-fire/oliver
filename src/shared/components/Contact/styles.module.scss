@@ -13,36 +13,6 @@
   margin: 0;
 }
 
-.buttonGroup {
-  display: flex;
- 
-  background-color: $background;
-  border-radius: $radius-8;
-}
-
-.button {
-  flex: 1;
-  height: 42px;
-  
-  background-color: transparent;
-  border: none;
-  border-radius: $radius-6;
-  
-  font-size: 14px;
-  font-weight: 500;
-  color: $content-weak;
-  
-  cursor: pointer;
-  transition: all 0.2s ease;
-  
-  
-  &.active {
-    background-color: $background-strong;
-    border-color: $border-base;
-    color: $content;
-  }
-}
-
 .phoneInput {
   display: flex;
   align-items: center;

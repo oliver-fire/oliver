@@ -1,0 +1,561 @@
+@import "@/shared/styles/variables.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.controlBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  
+}
+
+.buildingSelectorWrapper {
+  position: relative;
+  flex: 1;
+}
+
+.buildingSelector {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+}
+
+.buildingIcon {
+  color: $content;
+  flex-shrink: 0;
+}
+
+.buildingName {
+  font-size: 15px;
+  font-weight: 500;
+  color: $content;
+  margin:0;
+}
+
+.dropdownCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+}
+
+.zoomControls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-8;
+  flex-shrink: 0;
+  border: 1px solid $border-base;
+  border-radius: $radius-8;
+  padding: $spacing-4;
+}
+
+.invertedButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: $background;
+  border: 1px solid $border-base;
+  border-radius: $radius-8;
+  color: $button-background;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: $background-strong;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.zoomDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  height: 32px;
+  padding: 0 $spacing-12;
+  background-color: $background;
+  border: 1px solid $border-base;
+  border-radius: $radius-8;
+  color: $button-background;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: default;
+}
+
+.right {
+  display: flex;
+  margin:0;
+  padding: $spacing-16 $spacing-16;
+  align-items: center;
+  gap: $spacing-10;
+  border-radius: var(--Radius-Full, 9999px);
+  background: $background;
+  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.03);
+  width: 182px;
+  height: 44px;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background-color: $background;
+  border-radius: $radius-12;
+  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1);
+  width: 182px;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.searchSection {
+  padding: 12px;
+}
+
+.searchInput {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: $spacing-12;
+  color: $content-weak;
+  pointer-events: none;
+}
+
+.searchField {
+  width: 100%;
+  height: 40px;
+  padding: 0 $spacing-12 0 $spacing-32;
+  background-color: $background-strong;
+  border: none;
+  border-radius: var(--Radius-12, 12px);
+  font-size: 15px;
+  color: $content;
+  outline: none;
+
+  &::placeholder {
+    color: $content-weak;
+  }
+}
+
+.floorList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-8;
+  padding: 0 $spacing-12;
+}
+
+.floorItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  padding: 0 $spacing-12;
+  border: none;
+  border-radius: $radius-8;
+  font-size: 15px;
+  color: $content;
+  cursor: pointer;
+  text-align: left;
+  background-color: $background;
+  
+  &:hover {
+    background-color: $background-hover;
+  }
+}
+
+.floorItemActive {
+  background-color: $background-strong;
+}
+
+.actionSection {
+  border-top: 1px solid $border-base;
+  padding: $spacing-8;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-8;
+  width: 100%;
+  height: 40px;
+  padding: 0 $spacing-12;
+  background: none;
+  border: none;
+  border-radius: $radius-8;
+  font-size: 15px;
+  color: $content;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    background-color: $background-hover;
+  }
+}
+
+.mapContainer {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  margin-top: $spacing-16;
+}
+
+.mapCanvas {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: $radius-12;
+  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.05);
+}
+
+.bottomBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 48px;
+  padding: 0;
+  margin-top: $spacing-16;
+}
+
+.rescanButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-8;
+  height: 32px;
+  padding: 0 $spacing-16;
+  background: none;
+  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: $content;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+.productSelectorWidget {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 700px;
+  background-color: $background;
+  border-radius: $radius-16;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-24;
+  padding: $spacing-32;
+}
+
+.productSelectorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.productSelectorTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: $content;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: $content-weak;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    color: $content;
+  }
+}
+
+.productCards {
+  display: flex;
+  gap: $spacing-24;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.productCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-16;
+  width: 280px;
+  padding: $spacing-24;
+  background-color: $background;
+  border: 2px solid $border;
+  border-radius: $radius-16;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+
+  &:hover {
+    border-color: $content-weak;
+    
+  }
+
+  &.selected {
+    border-color: #EAEAEA;
+    
+  }
+}
+
+.productCardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: $content;
+  margin: 0;
+  text-align: center;
+}
+
+.productCardDescription {
+  font-size: 14px;
+  font-weight: 400;
+  color: $content-weak;
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.productCardImage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 120px;
+
+  img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+  }
+}
+
+.checkIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.checkBox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid $border;
+  border-radius: $radius-6;
+  background-color: $background-strong;
+}
+
+.checkBoxChecked {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: $radius-6;
+  background-color: $content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.productSelectorFooter {
+  display: flex;
+  justify-content: center;
+}
+
+.managementModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 600px;
+  background-color: $background;
+  border-radius: $radius-16;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.managementFloorLeftTop{
+  display: flex;
+  align-items: center;
+  gap: $spacing-12
+}
+
+
+.managementHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-24;
+  border-bottom: 1px solid $border-base;
+}
+
+.managementTitle {
+  font-size: 22px;
+  font-weight: 600;
+  color: $content;
+  margin: 0;
+}
+
+.managementFloorList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.closeButton {
+  border: 1px solid #EAEAEA;
+  border-radius: $radius-8;
+  width: 48px;
+  height: 48px;
+}
+.managementFloorItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-16;
+  border-radius: $radius-8;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: $background-hover;
+  }
+}
+
+.managementFloorLeft {
+  display: flex;
+  align-items: center;
+  gap: $spacing-16;
+  flex: 1;
+}
+
+.managementFloorIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $content;
+}
+
+.managementFloorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  flex: 1;
+}
+
+.managementFloorName {
+  font-size: 22px;
+  font-weight: 500;
+  color: $content;
+}
+
+.managementFloorAddress {
+  font-size: 18px;
+  font-weight: 400;
+  color: $content-weak;
+}
+
+.managementFloorActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-8;
+}
+
+.managementEditButton,
+.managementDeleteButton,
+.managementSaveButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: $spacing-8;
+  color: $content-weak;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-6;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: $content;
+    background-color: $background-hover;
+  }
+}
+
+.managementFloorNameInput {
+  font-size: 22px;
+  font-weight: 500;
+  color: $content;
+  border: 1px solid $border-base;
+  border-radius: $radius-8;
+  padding: $spacing-8;
+  outline: none;
+  background-color: $background;
+
+  &:focus {
+    border-color: $background-brand;
+  }
+}
+
+.managementFooter {
+  padding: $spacing-24;
+}

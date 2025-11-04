@@ -36,3 +36,19 @@
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 100;
 }
+
+.grayBackground {
+    background-color: #EFF0F2;
+}
+
+.noOverflow {
+    overflow: auto;
+    
+    /* 스크롤바 숨기기 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    
+    &::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+}

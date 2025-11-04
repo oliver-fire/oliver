@@ -1,0 +1,130 @@
+@import "@/shared/styles/variables.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: $spacing-64 $spacing-24;
+  gap: $spacing-32;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-24;
+  text-align: center;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+  color: $content;
+  margin: 0;
+}
+
+.instructionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.instruction {
+  font-size: 15px;
+  color: $content-weak;
+  margin: 0;
+}
+
+.instructionWarning {
+  color: $content;
+}
+
+.robotSelector {
+  display: flex;
+  align-items: center;
+  gap: $spacing-16;
+  padding: $spacing-24;
+  background-color: $background;
+  border: 1px solid $border-base;
+  border-radius: $radius-12;
+  width: 100%;
+  max-width: 440px;
+  max-height: 92px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: $background-hover;
+  }
+}
+
+.robotIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background-color: $background-strong;
+  border-radius: $radius-8;
+  flex-shrink: 0;
+
+  img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+  }
+}
+
+.robotInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  text-align: left;
+}
+
+.robotName {
+  font-size: 18px;
+  font-weight: 600;
+  color: $content;
+  margin: 0;
+}
+
+.robotDetails {
+  font-size: 15px;
+  color: $content-weak;
+  margin: 0;
+}
+
+.dropdownIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: $content-weak;
+  flex-shrink: 0;
+}
+
+.estimatedTime {
+  font-size: 15px;
+  color: $content-weak;
+  text-align: center;
+}
+
+.estimatedTimeLabel {
+  color: $content;
+}
+
+.estimatedTimeHighlight {
+  color: $content;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  margin-top: $spacing-8;
+}
+

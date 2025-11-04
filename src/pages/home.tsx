@@ -2,6 +2,7 @@ import MainLayout from "@/shared/components/main-layout";
 import { Segment, Alert } from "@/shared/components";
 import { useState } from "react";
 import { Plus, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Button from "@/shared/components/butoon";
 import { RobotList, NoRobotSection } from "@/modules/camera/components/facility";
 import { MakeRobotSection1, MakeRobotSection2, MakeRobotSection3 } from "@/modules/camera/components/only-page";
@@ -9,6 +10,7 @@ import { FireRobotDetailSection1, FireSensorDetailSection2 } from "@/modules/cam
 import { fireRobots, fireSensors } from "@/mok";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [hasRobots, setHasRobots] = useState(true);
   const [selectedSegment, setSelectedSegment] = useState("all");
   const [section, setSection] = useState(0);
@@ -51,8 +53,7 @@ export default function Home() {
               message={`올리버 제품을 사용하려면 먼저 공간을 생성하고 로봇을 배치해야 합니다.\n이 과정을 완료하기 전까지는 대부분의 기능이 제한됩니다.`}
               buttonText="페이지로 이동"
               onButtonClick={() => {
-                // TODO: 페이지 이동 로직
-                console.log("페이지로 이동");
+                navigate("/map");
               }}
               onClose={() => setShowAlert(false)}
             />
