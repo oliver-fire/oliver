@@ -13,11 +13,13 @@ export const apiClient = axios.create({
 // 요청 인터셉터 (인증 토큰 추가 등)
 apiClient.interceptors.request.use(
   (config) => {
-    // TODO: 토큰이 있으면 헤더에 추가
-    // const token = localStorage.getItem("token");
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // localStorage에 JWT 토큰이 있으면 Authorization 헤더에 추가
+    // 백엔드가 쿠키에 JWT를 넣어주는 경우 이 부분은 필요 없을 수 있음
+    // 하지만 백엔드가 Authorization 헤더를 요구하는 경우를 대비
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {

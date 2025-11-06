@@ -35,12 +35,19 @@ export default function AuthCallback() {
           try {
             // GET 요청으로 code를 쿼리 파라미터로 전송
             // 백엔드에서 쿠키를 주입해주므로 withCredentials: true 필요
-            await apiClient.get("/v1/auth/google/callback", {
+            const response = await apiClient.get("/v1/auth/google/callback", {
               params: {
                 code,
               },
               withCredentials: true, // 쿠키를 받기 위해 필요
             });
+            
+            // 백엔드가 응답으로 JWT 토큰을 반환하는 경우 (선택적)
+            // 쿠키에 JWT가 포함되어 있으면 이 부분은 필요 없음
+            if (response.data?.data?.token || response.data?.token) {
+              const jwtToken = response.data?.data?.token || response.data?.token;
+              localStorage.setItem("token", jwtToken);
+            }
             
             // 쿠키가 주입되었으므로 홈으로 리다이렉트 (replace로 히스토리 정리)
             navigate("/", { replace: true });
