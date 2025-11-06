@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import apiClient from "@/api/client";
 import s from "./login.module.scss";
 
 const GoogleIcon = () => (
@@ -22,6 +25,27 @@ const GoogleIcon = () => (
 );
 // 아니 왜 안올라가 버셀에?  
 export default function Login() {
+  const navigate = useNavigate();
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // 이미 로그인되어 있는지 확인
+        await apiClient.get("/v1/auth/me", {
+          withCredentials: true,
+        });
+        // 이미 로그인되어 있으면 홈으로 리다이렉트
+        navigate("/", { replace: true });
+      } catch (error) {
+        // 인증되지 않은 경우 로그인 페이지 유지
+        setIsChecking(false);
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
   const handleGoogleLogin = () => {
     // 백엔드 서버 도메인으로 직접 리다이렉트
     // 프론트엔드 callback URL을 쿼리 파라미터로 전달
@@ -32,6 +56,22 @@ export default function Login() {
     const googleAuthUrl = `${backendUrl}/v1/auth/google?callback=${encodeURIComponent(callbackUrl)}`;
     window.location.href = googleAuthUrl;
   };
+
+  // 인증 상태 확인 중
+  if (isChecking) {
+    return (
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        fontSize: "16px",
+        color: "#666"
+      }}>
+        로딩 중...
+      </div>
+    );
+  }
 
   return (
     <div className={s.container}>

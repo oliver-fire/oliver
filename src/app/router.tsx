@@ -1,11 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import { Camera, Emergency, Home, Login, Map, Settings, AuthCallback } from "@/pages";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
 export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Home />,
-  },
   {
     path: "/login",
     element: <Login />,
@@ -19,19 +17,43 @@ export const router = createBrowserRouter([
     element: <AuthCallback />,
   },
   {
+    path: "/",
+    element: (
+      <ProtectedRoute>
+        <Home />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/camera",
-    element: <Camera />,
+    element: (
+      <ProtectedRoute>
+        <Camera />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/emergency",
-    element: <Emergency />,
+    element: (
+      <ProtectedRoute>
+        <Emergency />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/map",
-    element: <Map />,
+    element: (
+      <ProtectedRoute>
+        <Map />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/settings",
-    element: <Settings />,
+    element: (
+      <ProtectedRoute>
+        <Settings />
+      </ProtectedRoute>
+    ),
   },
 ]);

@@ -31,10 +31,15 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    // TODO: 에러 처리 로직
-    // if (error.response?.status === 401) {
-    //   // 로그아웃 처리
-    // }
+    // 401 에러 시 로그인 페이지로 리다이렉트
+    if (error.response?.status === 401) {
+      // 로그인 페이지가 아닌 경우에만 리다이렉트
+      if (window.location.pathname !== "/login" && 
+          window.location.pathname !== "/auth/callback" &&
+          window.location.pathname !== "/auth/success") {
+        window.location.href = "/login";
+      }
+    }
     return Promise.reject(error);
   }
 );
