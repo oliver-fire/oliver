@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { ChevronDown, Radar } from "lucide-react";
 import Button from "@/shared/components/butoon";
-// TODO: API에서 디바이스 데이터 가져오기
-// import { getAllDevices } from "@/api";
 import s from "./styles.module.scss";
 
 interface Props {
@@ -13,7 +11,6 @@ export default function MakeBuildSection2({ onStartScan }: Props) {
   const [selectedRobotId] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   
-  // TODO: API에서 디바이스 데이터 가져오기
   const fireRobots: any[] = [];
   const selectedRobot = fireRobots.find(robot => robot.id === selectedRobotId) || fireRobots[0] || null;
 

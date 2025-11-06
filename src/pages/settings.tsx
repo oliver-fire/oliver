@@ -4,7 +4,6 @@ import MainLayout from "@/shared/components/main-layout";
 import { Phone, ChevronDown } from "lucide-react";
 import s from "./settings.module.scss";
 
-// 임시 소방서 목데이터
 const fireStations = [
   "서울강서소방서",
   "서울강남소방서",

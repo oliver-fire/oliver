@@ -2,7 +2,6 @@ import { useLocation } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import s from "./styles.module.scss";
 
-// 경로별 페이지 이름 매핑
 const routeNames: Record<string, string> = {
   "/": "Robot",
   "/camera": "Camera",

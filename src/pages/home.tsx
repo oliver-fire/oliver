@@ -11,14 +11,11 @@ import { getAllDevices, DeviceDto, registerRobot, registerSensor } from "@/api";
 import { FireRobot } from "@/mok/fire-robot";
 import { FireSensor as FireSensorType } from "@/mok/fire-sensor";
 
-// DeviceDto를 FireRobot/FireSensor 형식으로 변환
 const mapDeviceToFireRobot = (device: DeviceDto): FireRobot | FireSensorType => {
-  // location 객체를 문자열로 변환
   const locationStr = device.location 
     ? `${device.location.buildingName} ${device.location.floorName}`
     : "";
   
-  // createdAt을 날짜 문자열로 변환
   const lastUpdate = device.createdAt 
     ? new Date(device.createdAt).toLocaleString("ko-KR", {
         year: "numeric",
@@ -29,7 +26,6 @@ const mapDeviceToFireRobot = (device: DeviceDto): FireRobot | FireSensorType => 
       })
     : "";
   
-  // status를 한글로 변환
   const statusMap: Record<string, string> = {
     "idle": "대기중",
     "moving": "이동중",
@@ -70,18 +66,15 @@ export default function Home() {
   const [fireRobots, setFireRobots] = useState<DeviceDto[]>([]);
   const [fireSensors, setFireSensors] = useState<DeviceDto[]>([]);
   
-  // 임시 일련번호 목데이터
   const mockSerialNumbers = {
     robot: "OLV960XFH-X92AG",
     sensor: "OLV960XFD-X93BG"
   };
   
-  // API에서 디바이스 데이터 가져오기
   const fetchDevices = async () => {
     try {
       const devices = await getAllDevices();
       
-      // 로봇과 센서 분리
       const robots = devices.filter(device => device.type === "robot");
       const sensors = devices.filter(device => device.type === "sensor");
       
@@ -104,7 +97,6 @@ export default function Home() {
     return "all";
   };
   
-  // 선택된 로봇 찾기 및 변환
   const getSelectedRobot = (): FireRobot | FireSensorType | null => {
     if (!selectedRobotId) return null;
     const allRobots = [...fireRobots, ...fireSensors];
@@ -114,7 +106,6 @@ export default function Home() {
 
   const selectedRobot = getSelectedRobot();
   
-  // 로봇 타입 확인 (소화 로봇 vs 화재 감지기)
   const isFireRobot = selectedRobot && fireRobots.some(robot => robot.deviceId === selectedRobotId);
   
   return (
@@ -210,7 +201,6 @@ export default function Home() {
           
           {selectedRobotId && selectedRobot && (
             <>
-              {/* 오버레이 */}
               <div 
                 style={{
                   position: "fixed",
@@ -224,7 +214,6 @@ export default function Home() {
                 onClick={() => setSelectedRobotId(null)}
               />
               
-              {/* 위젯 */}
               <div
                 style={{
                   position: "fixed",
@@ -242,7 +231,6 @@ export default function Home() {
                     robot={selectedRobot}
                     onClose={() => setSelectedRobotId(null)}
                     onDelete={() => {
-                      // TODO: 로봇 삭제 로직
                       console.log("로봇 삭제:", selectedRobotId);
                       setSelectedRobotId(null);
                     }}
@@ -252,7 +240,6 @@ export default function Home() {
                     sensor={selectedRobot}
                     onClose={() => setSelectedRobotId(null)}
                     onDelete={() => {
-                      // TODO: 센서 삭제 로직
                       console.log("센서 삭제:", selectedRobotId);
                       setSelectedRobotId(null);
                     }}
@@ -268,17 +255,14 @@ export default function Home() {
           serialNumber={mockSerialNumbers[selectedRobotType]}
           onConfirm={async () => {
             try {
-              // 로봇/센서 등록 API 호출
               if (selectedRobotType === "robot") {
                 await registerRobot("김똥개로봇");
               } else {
                 await registerSensor("김똥개로봇");
               }
               
-              // 등록 성공 후 리스트 새로고침
               await fetchDevices();
               
-              // 홈 화면으로 돌아가기
               setHasRobots(true);
               setSection(0);
             } catch (error) {

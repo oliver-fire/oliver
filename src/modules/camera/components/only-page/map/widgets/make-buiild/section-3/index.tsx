@@ -2,9 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Layers2, Minus, Plus, Search, Plus as PlusIcon, Settings, Radar, X, Check, Pencil, Trash2, Check as CheckIcon } from "lucide-react";
 import Button from "@/shared/components/butoon";
 import s from "./styles.module.scss";
-// TODO: API에서 데이터 가져오기
-// import { getAllBuildings, updateBuilding, getAllDevices } from "@/api";
-// import { BuildingDto, DeviceDto } from "@/api";
 import MapViewer from "./map-viewer";
 import { SmallFireRobot, SmallFireSensor } from "../../small0robot-components";
 import { FireRobotDetailSection1, FireSensorDetailSection2 } from "@/modules/camera/widgets";
@@ -104,12 +101,10 @@ export default function MakeBuildSection3({
   });
 
   const checkOverlap = (robot: Robot): boolean => {
-    // 배율에 따라 컴포넌트 크기 조정 (기본 100px, mapScale이 0이면 기본값 1 사용)
     const currentScale = mapScale || 1;
     const robotWidth = 100 * currentScale;
     const robotHeight = 100 * currentScale;
     
-    // 같은 위치에 다른 로봇이 있는지 확인 (화재감지기)
     return robots.some(r => 
       r.id !== robot.id && 
       r.type === "sensor" &&
@@ -155,10 +150,7 @@ export default function MakeBuildSection3({
 
   const handleSaveFloor = async () => {
     if (!selectedBuildingId || !editingFloor) return;
-    // TODO: API로 층 이름 업데이트
-    // await updateFloor(selectedBuildingId, floorId, { name: editedFloorName });
     
-    // selectedFloor도 업데이트
     if (selectedFloor === editingFloor) {
       setSelectedFloor(editedFloorName);
     }
@@ -169,10 +161,7 @@ export default function MakeBuildSection3({
 
   const handleDeleteFloor = async (floorToDelete: string) => {
     if (!selectedBuildingId) return;
-    // TODO: API로 층 삭제
-    // await deleteFloor(selectedBuildingId, floorId);
     
-    // 선택된 층이 삭제되면 첫 번째 층으로 변경
     const remainingFloors = floors.filter(f => f.name !== floorToDelete);
     if (selectedFloor === floorToDelete && remainingFloors.length > 0) {
       setSelectedFloor(remainingFloors[0].name);
@@ -180,7 +169,6 @@ export default function MakeBuildSection3({
   };
 
   const handleMoveBuilding = () => {
-    // TODO: 건물 이동 기능 구현
     console.log("건물 이동하기 클릭됨");
   };
 
@@ -189,8 +177,6 @@ export default function MakeBuildSection3({
     const robot = robots.find(r => r.id === selectedRobotId);
     if (!robot) return null;
     
-    // TODO: API에서 디바이스 상세 정보 가져오기
-    // return await getDeviceById(selectedRobotId);
     return robot;
   };
 
@@ -249,7 +235,6 @@ export default function MakeBuildSection3({
 
           {isDropdownOpen && (
             <div className={s.dropdown}>
-              {/* Search Section */}
               <div className={s.searchSection}>
                 <div className={s.searchInput}>
                   <Search size={18} className={s.searchIcon} />
@@ -263,7 +248,6 @@ export default function MakeBuildSection3({
                 </div>
               </div>
 
-              {/* Floor List Section */}
               <div className={s.floorList}>
                 {filteredFloors.map((floor: Floor) => {
                   return (
@@ -281,7 +265,6 @@ export default function MakeBuildSection3({
                 })}
               </div>
 
-              {/* Action Buttons Section */}
               <div className={s.actionSection}>
                 <button 
                   className={s.actionButton}
@@ -426,7 +409,6 @@ export default function MakeBuildSection3({
               <Button
                 text="확인"
                 onClick={() => {
-                  // 현재 배율에 따라 위치와 크기 조정 (mapScale이 0이면 기본값 1 사용)
                   const currentScale = mapScale || 1;
                   const baseX = 100 / currentScale;
                   const baseY = 100 / currentScale;
@@ -450,7 +432,6 @@ export default function MakeBuildSection3({
 
       {selectedRobotId && selectedRobotDetail && (
         <>
-          {/* 오버레이 */}
           <div 
             style={{
               position: "fixed",
@@ -464,7 +445,6 @@ export default function MakeBuildSection3({
             onClick={() => setSelectedRobotId(null)}
           />
           
-          {/* 위젯 */}
           <div
             style={{
               position: "fixed",

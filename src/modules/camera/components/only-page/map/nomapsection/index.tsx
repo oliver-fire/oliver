@@ -78,7 +78,6 @@ export default function NoMapSection({
       {section === 3 && (
         <MakeBuildSection3 
           onComplete={() => {
-            // TODO: 완료 로직
             console.log("스캔 완료");
           }}
           onAddSpace={() => setSection(1)}

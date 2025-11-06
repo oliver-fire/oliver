@@ -13,19 +13,15 @@ interface Props {
   sensors?: DeviceDto[];
 }
 
-// DeviceDto를 FireRobotItem이 기대하는 형식으로 변환
 const mapDeviceToRobotItem = (device: DeviceDto) => {
-  // location 객체를 문자열로 변환
   const locationStr = device.location 
     ? `${device.location.buildingName} ${device.location.floorName}`
     : "정보 없음";
   
-  // createdAt을 날짜 문자열로 변환
   const lastUpdate = device.createdAt 
     ? new Date(device.createdAt).toLocaleDateString("ko-KR")
     : "정보 없음";
   
-  // status를 한글로 변환 (필요시)
   const statusMap: Record<string, string> = {
     "idle": "대기중",
     "moving": "이동중",
@@ -66,7 +62,6 @@ export default function RobotList({
     ? sensors 
     : [...robots, ...sensors];
 
-  // 검색 필터링
   const filteredItems = items.filter(item => 
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );

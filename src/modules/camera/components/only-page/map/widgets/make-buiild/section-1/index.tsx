@@ -39,7 +39,6 @@ export default function MakeBuild({ isOpen, onClose, onNext }: MakeBuildProps) {
           <Button
             text="눌러서 추가하기"
             onClick={() => {
-              // TODO: 건물 추가 로직
               onNext?.();
             }}
           />

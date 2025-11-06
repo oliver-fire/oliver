@@ -26,7 +26,6 @@ export default function Section3({
     setIsConfirmed(true);
     onConfirm?.();
     
-    // 3초 후 나가기 버튼 표시
     setTimeout(() => {
       setShowExitButton(true);
     }, 3000);

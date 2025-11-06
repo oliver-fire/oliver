@@ -9,7 +9,6 @@ interface Props {
 
 export default function Section2({ onBack, onNext }: Props) {
   useEffect(() => {
-    // 3초 후 자동으로 다음 단계로 이동
     const timer = setTimeout(() => {
       onNext?.();
     }, 3000);

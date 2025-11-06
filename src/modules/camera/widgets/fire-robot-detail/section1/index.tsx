@@ -1,6 +1,4 @@
 import { useState } from "react";
-// TODO: API DTO 타입 사용
-// import { DeviceDto } from "@/api";
 import { Segment } from "@/shared/components";
 import Button from "@/shared/components/butoon";
 import { Pencil, X, Trash2, Wifi, Timer, Calendar, BatteryLow, BatteryFull, Layers2, FireExtinguisher } from "lucide-react";
@@ -8,7 +6,6 @@ import { FireRobot } from "@/mok/fire-robot";
 import { FireSensor } from "@/mok/fire-sensor";
 import s from "./styles.module.scss";
 
-// 로봇 정보 카드 컴포넌트
 function RobotInfoCard({ label, value, icon: Icon }: { label: string; value: string; icon?: React.ElementType }) {
   return (
     <div className={s.infoCard}>
@@ -21,7 +18,6 @@ function RobotInfoCard({ label, value, icon: Icon }: { label: string; value: str
   );
 }
 
-// 카메라 섹션 컴포넌트
 function CameraSection() {
   const [selectedCamera, setSelectedCamera] = useState("thermal");
 
@@ -48,7 +44,6 @@ function CameraSection() {
   );
 }
 
-// 위치 섹션 컴포넌트
 function LocationSection() {
   return (
     <div className={s.locationSection}>
@@ -67,7 +62,6 @@ function LocationSection() {
   );
 }
 
-// 주요 기록 섹션 컴포넌트
 function KeyRecordSection() {
   return (
     <div className={s.keyRecordSection}>
@@ -102,7 +96,6 @@ function KeyRecordSection() {
   );
 }
 
-// 메인 컴포넌트
 interface FireRobotDetailSectionProps {
   robot: FireRobot | FireSensor;
   onClose?: () => void;
@@ -121,7 +114,6 @@ export default function FireRobotDetailSection({ robot, onClose, onDelete, onMov
   };
 
   const handleSaveName = () => {
-    // TODO: 이름 저장 로직
     console.log("이름 저장:", editedName);
     setIsEditingName(false);
   };
@@ -132,7 +124,6 @@ export default function FireRobotDetailSection({ robot, onClose, onDelete, onMov
 
   return (
     <div className={s.fireRobotDetail}>
-      {/* 상단: 헤더 */}
       <div className={s.topSection}>
         <div className={s.header}>
           <div className={s.headerInfo}>
@@ -169,9 +160,7 @@ export default function FireRobotDetailSection({ robot, onClose, onDelete, onMov
         </div>
       </div>
 
-      {/* 중간: 로봇 정보 콘텐츠 */}
       <div className={s.middleSection}>
-        {/* 로봇 정보 */}
         <div className={s.section}>
           <div className={s.infoGrid}>
             
@@ -202,23 +191,19 @@ export default function FireRobotDetailSection({ robot, onClose, onDelete, onMov
           </div>
         </div>
 
-        {/* 로봇 카메라 */}
         <div className={s.section}>
           <h3 className={s.sectionTitle}>로봇 카메라</h3>
           <CameraSection />
         </div>
 
-        {/* 위치 */}
         <div className={s.section}>
           <h3 className={s.sectionTitle}>위치</h3>
           <LocationSection />
         </div>
 
-        {/* 주요 기록 */}
         <KeyRecordSection />
       </div>
 
-      {/* 하단: 버튼들 */}
       <div className={s.bottomSection}>
         {onMoveBuilding && (
           <button className={s.moveButton} onClick={onMoveBuilding}>

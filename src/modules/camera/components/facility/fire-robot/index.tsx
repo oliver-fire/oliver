@@ -1,11 +1,8 @@
-// TODO: API DTO 타입 사용
-// import { DeviceDto } from "@/api";
 import s from "./styles.module.scss";
 import { Loader, BatteryCharging, BellElectric, FireExtinguisher, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 
-// TODO: DeviceDto 타입으로 변경
 interface Props {
-  robot: any; // FireRobot | FireSensor -> DeviceDto로 변경 예정
+  robot: any;
   onSelect?: (robotId: string | null) => void;
   isSelected?: boolean;
 }
@@ -30,14 +27,13 @@ const getStatusConfig = (status: string) => {
         bgColor: "#FFF3E0",
         textColor: "#FF8C00",
       };
-    case "진화중":
-      return {
-        icon: FireExtinguisher,
-        bgColor: "#FFE5E5",
-        textColor: "#FF4842",
-      };
-    // 센서 상태
-    case "정상":
+      case "진화중":
+        return {
+          icon: FireExtinguisher,
+          bgColor: "#FFE5E5",
+          textColor: "#FF4842",
+        };
+      case "정상":
       return {
         icon: CheckCircle,
         bgColor: "#E0F7E3",

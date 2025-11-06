@@ -15,7 +15,6 @@ export default function VideoSection() {
     setSelectedVideo(null);
   };
 
-  // 임시 비디오 정보 데이터
   const videoInfos = [
     { status: "화재 진압 중", robotName: "소화 로봇 1호", usage: 52 },
     { status: "현재 연결 중", robotName: "소방 로봇 1호", battery: 83 },

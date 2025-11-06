@@ -6,7 +6,6 @@ import {
   DeleteDeviceResponseDto,
 } from "./dto/device";
 
-// API 응답 래퍼 타입
 interface ApiResponse<T> {
   status: number;
   message: string;
@@ -14,33 +13,21 @@ interface ApiResponse<T> {
   data: T;
 }
 
-/**
- * 모든 디바이스 조회
- */
 export const getAllDevices = async (): Promise<DeviceDto[]> => {
   const response = await apiClient.get<ApiResponse<DeviceDto[]>>("/v1/device");
   return response.data.data;
 };
 
-/**
- * 디바이스 ID로 조회
- */
 export const getDeviceById = async (deviceId: string): Promise<DeviceDto> => {
   const response = await apiClient.get<ApiResponse<DeviceDto>>(`/v1/device/${deviceId}`);
   return response.data.data;
 };
 
-/**
- * 디바이스 타입별 조회
- */
 export const getDevicesByType = async (type: "robot" | "sensor"): Promise<DeviceDto[]> => {
   const response = await apiClient.get<ApiResponse<DeviceDto[]>>(`/v1/device?type=${type}`);
   return response.data.data;
 };
 
-/**
- * 디바이스 업데이트
- */
 export const updateDevice = async (
   deviceId: string,
   data: UpdateDeviceDto
@@ -49,15 +36,11 @@ export const updateDevice = async (
   return response.data;
 };
 
-/**
- * 디바이스 삭제
- */
 export const deleteDevice = async (deviceId: string): Promise<DeleteDeviceResponseDto> => {
   const response = await apiClient.delete<DeleteDeviceResponseDto>(`/devices/${deviceId}`);
   return response.data;
 };
 
-// 로봇/센서 등록 요청 DTO
 export interface RegisterDeviceDto {
   id: string;
   buildingId: string;
@@ -66,7 +49,6 @@ export interface RegisterDeviceDto {
   tuyaDeviceRegisterKey?: string;
 }
 
-// ID 예시 리스트
 const ID_EXAMPLES = [
   "f3a2b1c4-d5e6-49f7-8a0b-1c2d3e4f5a6b",
   "9d8e7f6a-5b4c-43d2-8a1b-2c3d4e5f6a7b",
@@ -83,19 +65,14 @@ const ID_EXAMPLES = [
   "0a1b2c3d-4e5f-40a6-9b7c-8d9e0f1a2b3c",
 ];
 
-// 랜덤 ID 선택 함수
 const getRandomId = (): string => {
   const randomIndex = Math.floor(Math.random() * ID_EXAMPLES.length);
   return ID_EXAMPLES[randomIndex];
 };
 
-// 고정 buildingId와 floorId
 const FIXED_BUILDING_ID = "6c33d97d-49c6-4b83-95c8-9aadde2dc8db";
 const FIXED_FLOOR_ID = "8b151b5c-65bf-46f4-8f69-f47f0a67812f";
 
-/**
- * 로봇 등록
- */
 export const registerRobot = async (name: string = "김똥개로봇"): Promise<DeviceDto> => {
   const data: RegisterDeviceDto = {
     id: getRandomId(),
@@ -107,9 +84,6 @@ export const registerRobot = async (name: string = "김똥개로봇"): Promise<D
   return response.data.data;
 };
 
-/**
- * 센서 등록
- */
 export const registerSensor = async (name: string = "김똥개로봇"): Promise<DeviceDto> => {
   const data: RegisterDeviceDto = {
     id: getRandomId(),
