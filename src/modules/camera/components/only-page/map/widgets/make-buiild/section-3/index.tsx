@@ -19,18 +19,41 @@ interface Robot {
   type?: "robot" | "sensor";
 }
 
+interface Building {
+  id: string;
+  name: string;
+}
+
+interface Floor {
+  id: string;
+  level: number;
+  name: string;
+}
+
 interface Props {
   onComplete?: () => void;
   onAddSpace?: () => void;
+  buildings: Building[];
+  floors: Floor[];
+  maxFloorLevel: number;
+  onFetchFloors: (buildingId: string) => Promise<void>;
+  onAddFloor: (buildingId: string, floorName: string) => Promise<void>;
 }
 
-export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace }: Props) {
+export default function MakeBuildSection3({ 
+  onComplete: _onComplete, 
+  onAddSpace,
+  buildings,
+  floors,
+  maxFloorLevel,
+  onFetchFloors,
+  onAddFloor
+}: Props) {
   const [zoomLevel, setZoomLevel] = useState(50);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedFloor, setSelectedFloor] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  // TODO: BuildingDto 타입으로 변경
-  const [building, setBuilding] = useState<any | null>(null);
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string | null>(null);
   const [robots, setRobots] = useState<Robot[]>([]);
   const [mapOffset, setMapOffset] = useState({ x: 0, y: 0 });
   const [isMapDragging, setIsMapDragging] = useState(false);
@@ -60,22 +83,24 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
   }, [mapScale]);
   
   useEffect(() => {
-    // TODO: API에서 건물 데이터 가져오기
-    // const buildings = await getAllBuildings();
-    // if (buildings.length > 0) {
-    //   const firstBuilding = buildings[0];
-    //   setBuilding(firstBuilding);
-    //   if (firstBuilding.floors.length > 0) {
-    //     setSelectedFloor(firstBuilding.floors[0].name);
-    //   }
-    // }
-  }, []);
+    if (buildings.length > 0) {
+      const firstBuilding = buildings[0];
+      setSelectedBuildingId(firstBuilding.id);
+      console.log("=== MakeBuildSection3 ===");
+      console.log("Building ID:", firstBuilding.id);
+      console.log("Building Name:", firstBuilding.name);
+      console.log("All Buildings:", buildings);
+      
+      if (floors.length > 0) {
+        setSelectedFloor(floors[0].name);
+      }
+    }
+  }, [buildings, floors]);
   
-  const floors = building?.floors || [];
+  const currentBuilding = buildings.find(b => b.id === selectedBuildingId);
   
-  const filteredFloors = floors.filter((floor: any) => {
-    const floorName = typeof floor === 'string' ? floor : floor.name;
-    return floorName.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredFloors = floors.filter((floor: Floor) => {
+    return floor.name.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   const checkOverlap = (robot: Robot): boolean => {
@@ -128,18 +153,10 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
     setEditedFloorName(floor);
   };
 
-  const handleSaveFloor = () => {
-    if (!building || !editingFloor) return;
+  const handleSaveFloor = async () => {
+    if (!selectedBuildingId || !editingFloor) return;
     // TODO: API로 층 이름 업데이트
-    // await updateFloor(building.buildingId, floorId, { name: editedFloorName });
-    
-    const updatedFloors = building.floors.map((floor: any) => 
-      floor === editingFloor || (typeof floor === 'object' && floor.name === editingFloor)
-        ? editedFloorName 
-        : floor
-    );
-    const updatedBuilding = { ...building, floors: updatedFloors };
-    setBuilding(updatedBuilding);
+    // await updateFloor(selectedBuildingId, floorId, { name: editedFloorName });
     
     // selectedFloor도 업데이트
     if (selectedFloor === editingFloor) {
@@ -150,21 +167,15 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
     setEditedFloorName("");
   };
 
-  const handleDeleteFloor = (floorToDelete: string) => {
-    if (!building) return;
+  const handleDeleteFloor = async (floorToDelete: string) => {
+    if (!selectedBuildingId) return;
     // TODO: API로 층 삭제
-    // await deleteFloor(building.buildingId, floorId);
-    
-    const updatedFloors = building.floors.filter((floor: any) => 
-      floor !== floorToDelete && (typeof floor === 'object' ? floor.name !== floorToDelete : true)
-    );
-    const updatedBuilding = { ...building, floors: updatedFloors };
-    setBuilding(updatedBuilding);
+    // await deleteFloor(selectedBuildingId, floorId);
     
     // 선택된 층이 삭제되면 첫 번째 층으로 변경
-    if (selectedFloor === floorToDelete && updatedFloors.length > 0) {
-      const firstFloor = typeof updatedFloors[0] === 'string' ? updatedFloors[0] : updatedFloors[0].name;
-      setSelectedFloor(firstFloor);
+    const remainingFloors = floors.filter(f => f.name !== floorToDelete);
+    if (selectedFloor === floorToDelete && remainingFloors.length > 0) {
+      setSelectedFloor(remainingFloors[0].name);
     }
   };
 
@@ -227,7 +238,9 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
           >
             <div className={s.right}>
               <Layers2 size={20} className={s.buildingIcon} />
-              <span className={s.buildingName}>{selectedFloor}</span>
+              <span className={s.buildingName}>
+                {currentBuilding?.name || ""} - {selectedFloor || "층 선택"}
+              </span>
               <div className={s.dropdownCircle}>
                 <ChevronDown size={20} />
               </div>
@@ -252,18 +265,17 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
 
               {/* Floor List Section */}
               <div className={s.floorList}>
-                {filteredFloors.map((floor: string | { name: string }) => {
-                  const floorName = typeof floor === 'string' ? floor : floor.name;
+                {filteredFloors.map((floor: Floor) => {
                   return (
                     <button
-                      key={floorName}
-                      className={`${s.floorItem} ${floorName === selectedFloor ? s.floorItemActive : ""}`}
+                      key={floor.id}
+                      className={`${s.floorItem} ${floor.name === selectedFloor ? s.floorItemActive : ""}`}
                       onClick={() => {
-                        setSelectedFloor(floorName);
+                        setSelectedFloor(floor.name);
                         setIsDropdownOpen(false);
                       }}
                     >
-                      {floorName}
+                      {floor.name}
                     </button>
                   );
                 })}
@@ -490,7 +502,7 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
         </>
       )}
 
-      {showManagementModal && building && (
+      {showManagementModal && currentBuilding && (
         <>
           <div className={s.overlay} onClick={() => setShowManagementModal(false)} />
           <div className={s.managementModal}>
@@ -505,17 +517,16 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
             </div>
 
             <div className={s.managementFloorList}>
-              {filteredFloors.map((floor: string | { name: string }) => {
-                const floorName = typeof floor === 'string' ? floor : floor.name;
+              {filteredFloors.map((floor: Floor) => {
                 return (
-                  <div key={floorName} className={s.managementFloorItem}>
+                  <div key={floor.id} className={s.managementFloorItem}>
                     <div className={s.managementFloorLeft}>
                       <div className={s.managementFloorInfo}>
                       <div className={s.managementFloorLeftTop}>
                       <div className={s.managementFloorIcon}>
                         <Layers2 size={26} />
                       </div>
-                      {editingFloor === floorName ? (
+                      {editingFloor === floor.name ? (
                         <input
                           type="text"
                           value={editedFloorName}
@@ -524,16 +535,16 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
                           autoFocus
                         />
                       ) : (
-                        <div className={s.managementFloorName}>{floorName}</div>
+                        <div className={s.managementFloorName}>{floor.name}</div>
                       )}
                       </div>
                       
                        
-                        <div className={s.managementFloorAddress}>{building.address}</div>
+                        <div className={s.managementFloorAddress}>{currentBuilding.name}</div>
                       </div>
                     </div>
                     <div className={s.managementFloorActions}>
-                      {editingFloor === floorName ? (
+                      {editingFloor === floor.name ? (
                         <button 
                           className={s.managementSaveButton}
                           onClick={handleSaveFloor}
@@ -543,15 +554,15 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
                       ) : (
                         <button 
                           className={s.managementEditButton}
-                          onClick={() => handleEditFloor(floorName)}
+                          onClick={() => handleEditFloor(floor.name)}
                         >
                           <Pencil size={24} />
                         </button>
                       )}
-                      {editingFloor !== floorName && (
+                      {editingFloor !== floor.name && (
                         <button 
                           className={s.managementDeleteButton}
-                          onClick={() => handleDeleteFloor(floorName)}
+                          onClick={() => handleDeleteFloor(floor.name)}
                         >
                           <Trash2 size={24} />
                         </button>

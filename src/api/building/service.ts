@@ -9,11 +9,61 @@ import {
   BuildingResponseDto,
 } from "./dto/building";
 
-/**
- * 모든 건물 조회
- */
-export const getAllBuildings = async (): Promise<BuildingDto[]> => {
-  const response = await apiClient.get<BuildingDto[]>("/buildings");
+export interface BuildingListResponse {
+  status: number;
+  message: string;
+  responseAt: string;
+  data: {
+    id: string;
+    name: string;
+  }[];
+}
+
+export interface FloorListResponse {
+  status: number;
+  message: string;
+  responseAt: string;
+  data: {
+    id: string;
+    level: number;
+    name: string;
+  }[];
+}
+
+export interface CreateFloorRequest {
+  level: number;
+  name: string;
+}
+
+export interface CreateFloorResponse {
+  status: number;
+  message: string;
+  responseAt: string;
+  data: {
+    id: string;
+    level: number;
+    name: string;
+  };
+}
+
+export const getAllBuildings = async (): Promise<BuildingListResponse> => {
+  const response = await apiClient.get<BuildingListResponse>("/v1/building");
+  return response.data;
+};
+
+export const getBuildingFloors = async (buildingId: string): Promise<FloorListResponse> => {
+  const response = await apiClient.get<FloorListResponse>(`/v1/building/${buildingId}/floors`);
+  return response.data;
+};
+
+export const createBuildingFloor = async (
+  buildingId: string,
+  data: CreateFloorRequest
+): Promise<CreateFloorResponse> => {
+  const response = await apiClient.post<CreateFloorResponse>(
+    `/v1/building/${buildingId}/floor`,
+    data
+  );
   return response.data;
 };
 

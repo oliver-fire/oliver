@@ -5,12 +5,36 @@ import MakeBuildSection2 from "../widgets/make-buiild/section-2";
 import MakeBuildSection3 from "../widgets/make-buiild/section-3";
 import s from "./styles.module.scss";
 
+interface Building {
+  id: string;
+  name: string;
+}
+
+interface Floor {
+  id: string;
+  level: number;
+  name: string;
+}
+
 interface Props {
   section: number;
   setSection: (section: number) => void;
+  buildings: Building[];
+  floors: Floor[];
+  maxFloorLevel: number;
+  onFetchFloors: (buildingId: string) => Promise<void>;
+  onAddFloor: (buildingId: string, floorName: string) => Promise<void>;
 }
 
-export default function NoMapSection({ section, setSection }: Props) {
+export default function NoMapSection({ 
+  section, 
+  setSection, 
+  buildings, 
+  floors, 
+  maxFloorLevel, 
+  onFetchFloors, 
+  onAddFloor 
+}: Props) {
   const handleStartScan = () => {
     setTimeout(() => {
       setSection(3);
@@ -58,6 +82,11 @@ export default function NoMapSection({ section, setSection }: Props) {
             console.log("스캔 완료");
           }}
           onAddSpace={() => setSection(1)}
+          buildings={buildings}
+          floors={floors}
+          maxFloorLevel={maxFloorLevel}
+          onFetchFloors={onFetchFloors}
+          onAddFloor={onAddFloor}
         />
       )}
     </>

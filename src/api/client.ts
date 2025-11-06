@@ -73,9 +73,18 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   (response) => {
+    console.log("=== API Response ===");
+    console.log("URL:", response.config.url);
+    console.log("Status:", response.status);
+    console.log("Data:", response.data);
     return response;
   },
   (error) => {
+    console.error("=== API Error ===");
+    console.error("URL:", error.config?.url);
+    console.error("Status:", error.response?.status);
+    console.error("Error Data:", error.response?.data);
+    console.error("Error Message:", error.message);
     return Promise.reject(error);
   }
 );
