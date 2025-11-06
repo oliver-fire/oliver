@@ -13,12 +13,12 @@ export const apiClient = axios.create({
 // 요청 인터셉터 (인증 토큰 추가 등)
 apiClient.interceptors.request.use(
   (config) => {
-    // 백엔드가 쿠키를 사용하므로, Authorization 헤더는 선택적
-    // 만약 백엔드가 Authorization 헤더도 지원한다면 아래 코드를 활성화
-    // const token = localStorage.getItem("token");
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // 백엔드가 쿠키로 accessToken을 주입하지만,
+    // 쿠키가 제대로 전송되지 않을 경우를 대비해 Authorization 헤더도 추가
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
