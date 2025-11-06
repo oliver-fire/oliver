@@ -20,7 +20,7 @@ const GoogleIcon = () => (
     />
   </svg>
 );
-
+// 아니 왜 안올라가 버셀에?  
 export default function Login() {
   const handleGoogleLogin = () => {
     // 백엔드 서버 도메인으로 직접 리다이렉트
