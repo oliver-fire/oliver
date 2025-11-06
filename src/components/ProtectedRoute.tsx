@@ -13,9 +13,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // 인증 상태 확인 API 호출 (예: /auth/me 또는 유사한 엔드포인트)
+        // 인증 상태 확인 API 호출
         // 백엔드에서 쿠키를 확인하여 인증 상태를 반환
-        await apiClient.get("/v1/auth/me", {
+        await apiClient.get("/v1/auth/@me", {
           withCredentials: true,
         });
         setIsAuthenticated(true);

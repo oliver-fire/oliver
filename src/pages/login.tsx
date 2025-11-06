@@ -32,7 +32,7 @@ export default function Login() {
     const checkAuth = async () => {
       try {
         // 이미 로그인되어 있는지 확인
-        await apiClient.get("/v1/auth/me", {
+        await apiClient.get("/v1/auth/@me", {
           withCredentials: true,
         });
         // 이미 로그인되어 있으면 홈으로 리다이렉트
