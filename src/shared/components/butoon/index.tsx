@@ -7,8 +7,6 @@ interface Props {
   rightIcon?: LucideIcon;
   onClick?: () => void;
   variant?: "primary" | "secondary";
-  width?: string | number;
-  height?: string | number;
 }
 
 export default function Button({ 
@@ -16,20 +14,12 @@ export default function Button({
   leftIcon: LeftIcon, 
   rightIcon: RightIcon, 
   onClick,
-  variant = "primary",
-  width,
-  height
+  variant = "primary"
 }: Props) {
-  const style: React.CSSProperties = {
-    width: typeof width === "number" ? `${width}px` : width,
-    height: typeof height === "number" ? `${height}px` : height,
-  };
-
   return (
     <button 
       className={`${s.button} ${s[variant]}`}
       onClick={onClick}
-      style={style}
     >
       {LeftIcon && <LeftIcon className={s.icon} />}
       <span className={s.text}>{text}</span>

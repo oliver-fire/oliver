@@ -1,10 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { Camera, Emergency, Home, Map, Settings } from "@/pages";
+import { Camera, Emergency, Home, Login, Map, Settings } from "@/pages";
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
   },
   {
     path: "/camera",

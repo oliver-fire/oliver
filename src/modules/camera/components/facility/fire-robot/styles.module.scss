@@ -8,10 +8,12 @@
   padding: $spacing-12 $spacing-16;
   background-color: $background;
   border-bottom: 1px solid $border;
+  cursor: pointer;
   
   &:hover {
     background-color: $background-hover;
   }
+  
 }
 
 .left {
@@ -19,13 +21,6 @@
   align-items: center;
   gap: $spacing-16;
   width: 300px;
-  flex-shrink: 0;
-}
-
-.checkbox {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
   flex-shrink: 0;
 }
 

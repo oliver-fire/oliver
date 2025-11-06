@@ -4,12 +4,13 @@ interface Props {
   name: string;
   x?: number;
   y?: number;
+  scale?: number;
   onMouseDown?: (e: React.MouseEvent) => void;
   onDoubleClick?: () => void;
   isOverlapped?: boolean;
 }
 
-export default function SmallFireSensor({ name, x = 0, y = 0, onMouseDown, onDoubleClick }: Props) {
+export default function SmallFireSensor({ name, x = 0, y = 0, scale = 1, onMouseDown, onDoubleClick }: Props) {
   return (
     <div 
       className={s.sensorCard}
@@ -19,6 +20,8 @@ export default function SmallFireSensor({ name, x = 0, y = 0, onMouseDown, onDou
         left: `${x}px`,
         top: `${y}px`,
         zIndex: 2,
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left',
       }}
       onMouseDown={onMouseDown}
       onDoubleClick={onDoubleClick}

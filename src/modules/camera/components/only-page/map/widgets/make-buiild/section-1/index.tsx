@@ -42,8 +42,6 @@ export default function MakeBuild({ isOpen, onClose, onNext }: MakeBuildProps) {
               // TODO: 건물 추가 로직
               onNext?.();
             }}
-            width={147}
-            height={48}
           />
         </div>
       </div>

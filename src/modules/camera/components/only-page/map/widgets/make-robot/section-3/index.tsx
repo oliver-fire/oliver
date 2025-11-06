@@ -73,15 +73,11 @@ export default function Section3({
               text="다른 로봇 찾기"
               onClick={() => onSearchAgain?.()}
               variant="secondary"
-              width={440}
-              height={48}
             />
             <Button
               text="네, 맞아요"
               rightIcon={ChevronRight}
               onClick={handleConfirm}
-              width={440}
-              height={48}
             />
           </>
         ) : showExitButton ? (
@@ -89,8 +85,6 @@ export default function Section3({
             text="나가기"
             rightIcon={ChevronRight}
             onClick={() => onExit?.()}
-            width={113}
-            height={48}
           />
         ) : (
           <div className={s.expectedTime}>예상 시간: 1분</div>

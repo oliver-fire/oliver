@@ -1,24 +1,27 @@
 import { useLocation } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 import s from "./styles.module.scss";
 
+// 경로별 페이지 이름 매핑
 const routeNames: Record<string, string> = {
   "/": "Robot",
   "/camera": "Camera",
   "/map": "Map",
   "/settings": "Settings",
+  "/emergency": "Emergency",
 };
 
 export default function SubHeader() {
   const location = useLocation();
   const currentPath = location.pathname;
-  const currentPage = routeNames[currentPath] || "Dashboard";
+  const currentPageName = routeNames[currentPath] || "Page";
 
   return (
     <div className={s.subHeader}>
       <div className={s.breadcrumb}>
         <span className={s.parent}>Dashboard</span>
-        <span className={s.separator}> &gt; </span>
-        <span className={s.current}>{currentPage}</span>
+        <ChevronRight className={s.separator} size={18} />
+        <span className={s.current}>{currentPageName}</span>
       </div>
     </div>
   );

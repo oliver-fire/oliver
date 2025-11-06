@@ -67,7 +67,7 @@ export default function Settings() {
         /> 
       </div>
 
-      <Button text="저장"  onClick={() => {}} width={70} height={48} />
+      <Button text="저장"  onClick={() => {}} />
       </div>
     </MainLayout>
   );

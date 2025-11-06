@@ -1,13 +1,62 @@
 import MainLayout from "@/shared/components/main-layout";
 import { Segment, Alert } from "@/shared/components";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Button from "@/shared/components/butoon";
 import { RobotList, NoRobotSection } from "@/modules/camera/components/facility";
 import { MakeRobotSection1, MakeRobotSection2, MakeRobotSection3 } from "@/modules/camera/components/only-page";
 import { FireRobotDetailSection1, FireSensorDetailSection2 } from "@/modules/camera/widgets";
-import { fireRobots, fireSensors } from "@/mok";
+import { getAllDevices, DeviceDto, registerRobot, registerSensor } from "@/api";
+import { FireRobot } from "@/mok/fire-robot";
+import { FireSensor as FireSensorType } from "@/mok/fire-sensor";
+
+// DeviceDto를 FireRobot/FireSensor 형식으로 변환
+const mapDeviceToFireRobot = (device: DeviceDto): FireRobot | FireSensorType => {
+  // location 객체를 문자열로 변환
+  const locationStr = device.location 
+    ? `${device.location.buildingName} ${device.location.floorName}`
+    : "";
+  
+  // createdAt을 날짜 문자열로 변환
+  const lastUpdate = device.createdAt 
+    ? new Date(device.createdAt).toLocaleString("ko-KR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric"
+      })
+    : "";
+  
+  // status를 한글로 변환
+  const statusMap: Record<string, string> = {
+    "idle": "대기중",
+    "moving": "이동중",
+    "charging": "충전중",
+    "error": "고장",
+    "paused": "대기중",
+    "evolving": "진화중",
+    "offline": "오프라인",
+    "normal": "정상",
+    "warning": "점검필요",
+    "alarm": "경고",
+  };
+  
+  const status = statusMap[device.status] || device.status || "";
+  
+  const baseData = {
+    id: device.deviceId,
+    name: device.name,
+    model: device.type === "robot" ? "소화 로봇" : "화재 감지기",
+    status: status as any,
+    battery: device.batteryLevel,
+    location: locationStr,
+    lastUpdate: lastUpdate,
+  };
+  
+  return baseData as FireRobot | FireSensorType;
+};
 
 export default function Home() {
   const navigate = useNavigate();
@@ -16,8 +65,10 @@ export default function Home() {
   const [section, setSection] = useState(0);
   const [selectedRobotType, setSelectedRobotType] = useState<"robot" | "sensor">("robot");
   const [selectedRobotId, setSelectedRobotId] = useState<string | null>(null);
-  const [showAlert, setShowAlert] = useState(true);
+  const [showAlert, setShowAlert] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [fireRobots, setFireRobots] = useState<DeviceDto[]>([]);
+  const [fireSensors, setFireSensors] = useState<DeviceDto[]>([]);
   
   // 임시 일련번호 목데이터
   const mockSerialNumbers = {
@@ -25,23 +76,46 @@ export default function Home() {
     sensor: "OLV960XFD-X93BG"
   };
   
+  // API에서 디바이스 데이터 가져오기
+  const fetchDevices = async () => {
+    try {
+      const devices = await getAllDevices();
+      
+      // 로봇과 센서 분리
+      const robots = devices.filter(device => device.type === "robot");
+      const sensors = devices.filter(device => device.type === "sensor");
+      
+      setFireRobots(robots);
+      setFireSensors(sensors);
+      setHasRobots(devices.length > 0);
+    } catch (error) {
+      console.error("디바이스 데이터 가져오기 실패:", error);
+      setHasRobots(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDevices();
+  }, []);
+  
   const getListType = () => {
     if (selectedSegment === "fire") return "robot";
     if (selectedSegment === "fireDetector") return "sensor";
     return "all";
   };
-
-  // 선택된 로봇 찾기
-  const getSelectedRobot = () => {
+  
+  // 선택된 로봇 찾기 및 변환
+  const getSelectedRobot = (): FireRobot | FireSensorType | null => {
     if (!selectedRobotId) return null;
     const allRobots = [...fireRobots, ...fireSensors];
-    return allRobots.find(robot => robot.id === selectedRobotId);
+    const device = allRobots.find(robot => robot.deviceId === selectedRobotId);
+    return device ? mapDeviceToFireRobot(device) : null;
   };
 
   const selectedRobot = getSelectedRobot();
   
   // 로봇 타입 확인 (소화 로봇 vs 화재 감지기)
-  const isFireRobot = selectedRobot && fireRobots.some(robot => robot.id === selectedRobotId);
+  const isFireRobot = selectedRobot && fireRobots.some(robot => robot.deviceId === selectedRobotId);
   
   return (
     <MainLayout>
@@ -60,8 +134,8 @@ export default function Home() {
           )}
           
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", width: "100%" }}>
-            <div>
-              <span style={{ fontSize: "24px", fontWeight: "500"}}>로봇 리스트</span><br/>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px"}}>
+              <span style={{ fontSize: "24px", fontWeight: "500"}}>로봇 리스트</span>
               <span style={{ color: "#8B8B8B" }}>로봇을 눌러서 상세 정보를 볼 수 있습니다</span>
             </div>
             <Button
@@ -71,8 +145,7 @@ export default function Home() {
                 setHasRobots(false);
                 setSection(1);
               }}
-              width={161}
-              height={48}
+    
             />
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
@@ -131,6 +204,8 @@ export default function Home() {
             onRobotSelect={setSelectedRobotId}
             selectedRobotId={selectedRobotId}
             searchQuery={searchQuery}
+            robots={fireRobots}
+            sensors={fireSensors}
           />
           
           {selectedRobotId && selectedRobot && (
@@ -191,8 +266,25 @@ export default function Home() {
         <MakeRobotSection3 
           robotType={selectedRobotType}
           serialNumber={mockSerialNumbers[selectedRobotType]}
-          onConfirm={() => {
-            // 로봇 등록 시작 처리
+          onConfirm={async () => {
+            try {
+              // 로봇/센서 등록 API 호출
+              if (selectedRobotType === "robot") {
+                await registerRobot("김똥개로봇");
+              } else {
+                await registerSensor("김똥개로봇");
+              }
+              
+              // 등록 성공 후 리스트 새로고침
+              await fetchDevices();
+              
+              // 홈 화면으로 돌아가기
+              setHasRobots(true);
+              setSection(0);
+            } catch (error) {
+              console.error("디바이스 등록 실패:", error);
+              alert("디바이스 등록에 실패했습니다. 다시 시도해주세요.");
+            }
           }}
           onExit={() => {
             setHasRobots(true);

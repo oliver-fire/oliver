@@ -4,7 +4,8 @@
     display: flex;
     background-color: $background;
     border: 1px solid $border-base;
-    border-radius: $radius-8;
+    border-radius: 12px;
+    overflow: hidden; /* 자식 요소가 부모를 넘어가지 못하게 함 */
 }
 
 .item {
@@ -13,11 +14,10 @@
     
     background-color: transparent;
     border: none;
-    border-radius: 0;
     
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
-    color: $content;
+    color: $content-weak;
     
     cursor: pointer;
     transition: all 0.2s ease;

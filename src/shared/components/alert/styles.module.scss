@@ -4,11 +4,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 16px 24px;
   background: #EFF0F2;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   gap: 16px;
 }
 
@@ -43,7 +42,7 @@
 .title {
   color: #000;
 font-family: Pretendard;
-font-size: 24px;
+font-size: 20px;
 font-style: normal;
 font-weight: 500;
 line-height: 150%; /* 36px */
@@ -52,7 +51,7 @@ line-height: 150%; /* 36px */
 .message {
   color: var(--Content-Base, #272727);
 font-family: Pretendard;
-font-size: 18px;
+font-size: 16px;
 font-style: normal;
 font-weight: 500;
 white-space: pre-line;

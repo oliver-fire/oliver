@@ -16,7 +16,6 @@
   gap: $spacing-24;
   
   padding: $spacing-12 $spacing-16;
-  background-color: $background-strong;
   border-bottom: 1px solid $border;
 }
 
@@ -26,6 +25,7 @@
   gap: $spacing-16;
   width: 300px;
   flex-shrink: 0;
+  color: $content-weak;
 }
 
 .checkbox {

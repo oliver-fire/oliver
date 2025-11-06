@@ -64,8 +64,6 @@ export default function Section1({ onNext }: Props) {
           text="다음"
           rightIcon={ChevronRight}
           onClick={() => onNext?.(selectedType)}
-          width={98}
-          height={48}
         />
       </div>
     </div>

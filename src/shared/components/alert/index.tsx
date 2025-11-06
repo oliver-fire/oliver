@@ -20,7 +20,7 @@ export default function Alert({
     <div className={s.alert}>
       <div className={s.content}>
         <div className={s.iconWrapper}>
-          <Layers2 size={35} color="#000000" />
+          <Layers2 size={28} color="#000000" />
         </div>
         <div className={s.textContent}>
           <h3 className={s.title}>{title}</h3>
@@ -28,7 +28,7 @@ export default function Alert({
         </div>
       </div>
       <div className={s.actions}>
-        <Button text={buttonText} onClick={onButtonClick} rightIcon={ArrowRight} variant="primary" width={161} height={48} />
+        <Button text={buttonText} onClick={onButtonClick} rightIcon={ArrowRight} variant="primary" />
       </div>
     </div>
   );

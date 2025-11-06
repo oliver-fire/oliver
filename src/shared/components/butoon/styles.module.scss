@@ -4,15 +4,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: $spacing-8;
+  gap: 8px;
   
-  height: 48px;
-  padding: 0 $spacing-24;
+  width: fit-content;
+  height: fit-content;
+  padding: 12px 20px;
   
   border: none;
-  border-radius: $radius-8;
+  border-radius: 12px;
   
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 500;
   
   cursor: pointer;
@@ -49,5 +50,6 @@
 
 .text {
   white-space: nowrap;
+  font-size: 15px;
 }
 

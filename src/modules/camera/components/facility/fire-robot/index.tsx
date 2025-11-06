@@ -1,10 +1,11 @@
-import { FireRobot, FireSensor } from "@/mok";
+// TODO: API DTO 타입 사용
+// import { DeviceDto } from "@/api";
 import s from "./styles.module.scss";
-import { Checkbox } from "@/shared/components";
 import { Loader, BatteryCharging, BellElectric, FireExtinguisher, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 
+// TODO: DeviceDto 타입으로 변경
 interface Props {
-  robot: FireRobot | FireSensor;
+  robot: any; // FireRobot | FireSensor -> DeviceDto로 변경 예정
   onSelect?: (robotId: string | null) => void;
   isSelected?: boolean;
 }
@@ -87,21 +88,18 @@ export default function FireRobotItem({ robot, onSelect, isSelected = false }: P
   const StatusIcon = statusConfig.icon;
   const batteryConfig = getBatteryConfig(robot.battery);
 
-  const handleCheckboxChange = (checked: boolean) => {
+  const handleClick = () => {
     if (onSelect) {
-      onSelect(checked ? robot.id : null);
+      onSelect(isSelected ? null : robot.id);
     }
   };
 
   return (
-    <div className={s.robotItem}>
+    <div 
+      className={`${s.robotItem} ${isSelected ? s.selected : ''}`}
+      onClick={handleClick}
+    >
       <div className={s.left}>
-        <Checkbox 
-          key={`${robot.id}-${isSelected}`}
-          label="" 
-          defaultChecked={isSelected}
-          onChange={handleCheckboxChange}
-        />
         <img src="/sample/fire-robot.svg" alt="소방 로봇" className={s.robotImage} />
         <div className={s.info}>
           <h3 className={s.name}>{robot.name}</h3>

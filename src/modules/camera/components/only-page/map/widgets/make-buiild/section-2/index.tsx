@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { ChevronDown, Radar } from "lucide-react";
 import Button from "@/shared/components/butoon";
-import { fireRobots } from "@/mok";
+// TODO: API에서 디바이스 데이터 가져오기
+// import { getAllDevices } from "@/api";
 import s from "./styles.module.scss";
 
 interface Props {
@@ -9,10 +10,12 @@ interface Props {
 }
 
 export default function MakeBuildSection2({ onStartScan }: Props) {
-  const [selectedRobotId] = useState<string | null>("robot-001");
+  const [selectedRobotId] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   
-  const selectedRobot = fireRobots.find(robot => robot.id === selectedRobotId) || fireRobots[0];
+  // TODO: API에서 디바이스 데이터 가져오기
+  const fireRobots: any[] = [];
+  const selectedRobot = fireRobots.find(robot => robot.id === selectedRobotId) || fireRobots[0] || null;
 
   const handleStartScan = () => {
     setIsScanning(true);
@@ -57,8 +60,8 @@ export default function MakeBuildSection2({ onStartScan }: Props) {
           <img src="/sample/fire-robot.svg" alt="로봇" />
         </div>
         <div className={s.robotInfo}>
-          <h3 className={s.robotName}>{selectedRobot.name}</h3>
-          <p className={s.robotDetails}>{selectedRobot.model}·배터리 {selectedRobot.battery}%</p>
+          <h3 className={s.robotName}>{selectedRobot?.name || "로봇 선택"}</h3>
+          <p className={s.robotDetails}>{selectedRobot ? `${selectedRobot.model}·배터리 ${selectedRobot.battery}%` : "로봇을 선택해주세요"}</p>
         </div>
         {!isScanning && (
           <div className={s.dropdownIcon}>
@@ -79,8 +82,6 @@ export default function MakeBuildSection2({ onStartScan }: Props) {
             text="스캔 시작하기"
             leftIcon={Radar}
             onClick={handleStartScan}
-            width={161}
-            height={48}
           />
         </div>
       )}

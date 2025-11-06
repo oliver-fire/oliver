@@ -18,8 +18,6 @@ export default function NoRobotSection({ onAddClick }: Props) {
           text="로봇 추가하기" 
           leftIcon={Plus} 
           onClick={() => onAddClick?.()} 
-          width={161} 
-          height={48} 
         />
       </div>
     </div>

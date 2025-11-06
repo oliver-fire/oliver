@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Layers2, Minus, Plus, Search, Plus as PlusIcon, Settings, Radar, X, Check, Pencil, Trash2, Check as CheckIcon } from "lucide-react";
 import Button from "@/shared/components/butoon";
 import s from "./styles.module.scss";
-import { getAllBuildings, Building, fireRobots, fireSensors, FireRobot, FireSensor, updateBuilding } from "@/mok";
+// TODO: API에서 데이터 가져오기
+// import { getAllBuildings, updateBuilding, getAllDevices } from "@/api";
+// import { BuildingDto, DeviceDto } from "@/api";
 import MapViewer from "./map-viewer";
 import { SmallFireRobot, SmallFireSensor } from "../../small0robot-components";
 import { FireRobotDetailSection1, FireSensorDetailSection2 } from "@/modules/camera/widgets";
@@ -21,11 +23,12 @@ interface Props {
 }
 
 export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace }: Props) {
-  const [zoomLevel, setZoomLevel] = useState(100);
+  const [zoomLevel, setZoomLevel] = useState(50);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedFloor, setSelectedFloor] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [building, setBuilding] = useState<Building | null>(null);
+  // TODO: BuildingDto 타입으로 변경
+  const [building, setBuilding] = useState<any | null>(null);
   const [robots, setRobots] = useState<Robot[]>([]);
   const [mapOffset, setMapOffset] = useState({ x: 0, y: 0 });
   const [isMapDragging, setIsMapDragging] = useState(false);
@@ -55,32 +58,36 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
   }, [mapScale]);
   
   useEffect(() => {
-    const buildings = getAllBuildings();
-    if (buildings.length > 0) {
-      const firstBuilding = buildings[0];
-      setBuilding(firstBuilding);
-      if (firstBuilding.floors.length > 0) {
-        setSelectedFloor(firstBuilding.floors[0]);
-      }
-    }
+    // TODO: API에서 건물 데이터 가져오기
+    // const buildings = await getAllBuildings();
+    // if (buildings.length > 0) {
+    //   const firstBuilding = buildings[0];
+    //   setBuilding(firstBuilding);
+    //   if (firstBuilding.floors.length > 0) {
+    //     setSelectedFloor(firstBuilding.floors[0].name);
+    //   }
+    // }
   }, []);
   
   const floors = building?.floors || [];
   
-  const filteredFloors = floors.filter(floor => 
-    floor.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredFloors = floors.filter((floor: any) => {
+    const floorName = typeof floor === 'string' ? floor : floor.name;
+    return floorName.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   const checkOverlap = (robot: Robot): boolean => {
-    const robotWidth = 100; // 컴포넌트 크기
-    const robotHeight = 100;
+    // 배율에 따라 컴포넌트 크기 조정 (기본 100px, mapScale이 0이면 기본값 1 사용)
+    const currentScale = mapScale || 1;
+    const robotWidth = 100 * currentScale;
+    const robotHeight = 100 * currentScale;
     
     // 같은 위치에 다른 로봇이 있는지 확인 (화재감지기)
     return robots.some(r => 
       r.id !== robot.id && 
       r.type === "sensor" &&
-      Math.abs(r.x - robot.x) < robotWidth && 
-      Math.abs(r.y - robot.y) < robotHeight
+      Math.abs((r.x * currentScale) - (robot.x * currentScale)) < robotWidth && 
+      Math.abs((r.y * currentScale) - (robot.y * currentScale)) < robotHeight
     );
   };
 
@@ -121,12 +128,16 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
 
   const handleSaveFloor = () => {
     if (!building || !editingFloor) return;
-    const updatedFloors = building.floors.map(floor => 
-      floor === editingFloor ? editedFloorName : floor
+    // TODO: API로 층 이름 업데이트
+    // await updateFloor(building.buildingId, floorId, { name: editedFloorName });
+    
+    const updatedFloors = building.floors.map((floor: any) => 
+      floor === editingFloor || (typeof floor === 'object' && floor.name === editingFloor)
+        ? editedFloorName 
+        : floor
     );
     const updatedBuilding = { ...building, floors: updatedFloors };
     setBuilding(updatedBuilding);
-    updateBuilding(updatedBuilding);
     
     // selectedFloor도 업데이트
     if (selectedFloor === editingFloor) {
@@ -139,14 +150,19 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
 
   const handleDeleteFloor = (floorToDelete: string) => {
     if (!building) return;
-    const updatedFloors = building.floors.filter(floor => floor !== floorToDelete);
+    // TODO: API로 층 삭제
+    // await deleteFloor(building.buildingId, floorId);
+    
+    const updatedFloors = building.floors.filter((floor: any) => 
+      floor !== floorToDelete && (typeof floor === 'object' ? floor.name !== floorToDelete : true)
+    );
     const updatedBuilding = { ...building, floors: updatedFloors };
     setBuilding(updatedBuilding);
-    updateBuilding(updatedBuilding);
     
     // 선택된 층이 삭제되면 첫 번째 층으로 변경
     if (selectedFloor === floorToDelete && updatedFloors.length > 0) {
-      setSelectedFloor(updatedFloors[0]);
+      const firstFloor = typeof updatedFloors[0] === 'string' ? updatedFloors[0] : updatedFloors[0].name;
+      setSelectedFloor(firstFloor);
     }
   };
 
@@ -160,13 +176,9 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
     const robot = robots.find(r => r.id === selectedRobotId);
     if (!robot) return null;
     
-    if (robot.type === "sensor") {
-      // 화재 감지기 mock 데이터 찾기
-      return fireSensors[0] || null;
-    } else {
-      // 소화 로봇 mock 데이터 찾기
-      return fireRobots[0] || null;
-    }
+    // TODO: API에서 디바이스 상세 정보 가져오기
+    // return await getDeviceById(selectedRobotId);
+    return robot;
   };
 
   const selectedRobotDetail = getSelectedRobotDetail();
@@ -307,12 +319,14 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
           {robots.map((robot) => {
             const RobotComponent = robot.type === "sensor" ? SmallFireSensor : SmallFireRobot;
             const isOverlapped = checkOverlap(robot);
+            const currentScale = mapScale || 1;
             return (
               <RobotComponent
                 key={robot.id}
                 name={robot.name}
-                x={robot.x * mapScale}
-                y={robot.y * mapScale}
+                x={robot.x * currentScale}
+                y={robot.y * currentScale}
+                scale={currentScale}
                 onMouseDown={(e) => handleRobotMouseDown(e, robot.id)}
                 onDoubleClick={() => handleRobotDoubleClick(robot.id)}
                 isOverlapped={isOverlapped}
@@ -327,8 +341,6 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
           text="제품 추가하기"
           leftIcon={Plus}
           onClick={() => setShowProductSelector(true)}
-          width={161}
-          height={48}
         />
 
         <button className={s.rescanButton}>
@@ -397,18 +409,22 @@ export default function MakeBuildSection3({ onComplete: _onComplete, onAddSpace 
               <Button
                 text="확인"
                 onClick={() => {
+                  // 현재 배율에 따라 위치와 크기 조정 (mapScale이 0이면 기본값 1 사용)
+                  const currentScale = mapScale || 1;
+                  const baseX = 100 / currentScale;
+                  const baseY = 100 / currentScale;
+                  const spacing = 10 / currentScale;
+                  
                   const newRobot: Robot = {
                     id: `robot-${Date.now()}`,
                     name: selectedProductType === "robot" ? "RX-780" : "FS-101",
-                    x: 100 + robots.length * 10,
-                    y: 100 + robots.length * 10,
+                    x: baseX + robots.length * spacing,
+                    y: baseY + robots.length * spacing,
                     type: selectedProductType,
                   };
                   setRobots([...robots, newRobot]);
                   setShowProductSelector(false);
                 }}
-                width={98}
-                height={48}
               />
             </div>
           </div>

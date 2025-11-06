@@ -32,8 +32,6 @@ export default function NoMapSection({ section, setSection }: Props) {
               text="건물 추가하기" 
               leftIcon={Plus} 
               onClick={() => setSection(1)} 
-              width={161} 
-              height={48} 
             />
           </div>
         </div>

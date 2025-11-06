@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { FireRobot, FireSensor } from "@/mok";
+// TODO: API DTO 타입 사용
+// import { DeviceDto } from "@/api";
 import { Segment } from "@/shared/components";
 import Button from "@/shared/components/butoon";
-import { Pencil, X, Trash2, Wifi, Timer, Calendar, BatteryLow, BatteryFull, Layers2 } from "lucide-react";
+import { Pencil, X, Trash2, Wifi, Timer, Calendar, BatteryLow, BatteryFull, Layers2, FireExtinguisher } from "lucide-react";
 import s from "./styles.module.scss";
 
 // 로봇 정보 카드 컴포넌트
@@ -68,14 +69,32 @@ function LocationSection() {
 function KeyRecordSection() {
   return (
     <div className={s.keyRecordSection}>
-      <div className={s.sectionHeader}>
-        <span className={s.sectionTitle}>최근 기록</span>
-      </div>
-      <div className={s.recordItem}>
-        <div className={s.recordIcon}>
-          <BatteryLow size={24} color="#F59E0B" />
+      <p className={s.sectionTitle}>최근 기록</p>
+      <div className={s.recordList}>
+        <div className={s.recordItem}>
+          <div className={s.recordLeft}>
+            <div className={s.recordIcon}>
+              <BatteryLow size={35} color="#FF9201" />
+            </div>
+            <div className={s.recordText}>
+              <p className={s.recordLabel}>배터리 부족</p>
+              <p className={s.recordDescription}>로봇의 배터리가 부족하여 충전 시작함 ㅅㄱ</p>
+            </div>
+          </div>
+          <p className={s.recordDate}>2025-08-19 12:11:24</p>
         </div>
-        <span className={s.recordLabel}>배터리 부족</span>
+        <div className={s.recordItem}>
+          <div className={s.recordLeft}>
+            <div className={s.recordIcon}>
+              <FireExtinguisher size={40} color="#8B8B8B" />
+            </div>
+            <div className={s.recordText}>
+              <p className={s.recordLabel}>화재 상황 종료</p>
+              <p className={s.recordDescription}>로봇의 배터리가 부족하여 충전 시작함 ㅅㄱ</p>
+            </div>
+          </div>
+          <p className={s.recordDate}>2025-08-19 12:11:24</p>
+        </div>
       </div>
     </div>
   );
@@ -129,8 +148,6 @@ export default function FireRobotDetailSection({ robot, onClose, onDelete, onMov
                     text="저장"
                     onClick={handleSaveName}
                     variant="primary"
-                    width={61}
-                    height={32}
                   />
                 </>
               ) : (
@@ -154,14 +171,19 @@ export default function FireRobotDetailSection({ robot, onClose, onDelete, onMov
       <div className={s.middleSection}>
         {/* 로봇 정보 */}
         <div className={s.section}>
-          <h3 className={s.sectionTitle}>로봇 정보</h3>
           <div className={s.infoGrid}>
+            
+            <div style={{ display: "flex", flexDirection: "row", gap: "40px"}}>
             <RobotInfoCard 
               icon={BatteryFull}
               label="배터리" 
               value={robot.battery ? `${getBatteryStatus(robot.battery)} (${robot.battery}%)` : "정보 없음"} 
             />
             <RobotInfoCard icon={Wifi} label="통신 상태" value={robot.status ? "좋음" : "정보 없음"} />
+            </div>
+           
+
+           <div style={{ display: "flex", flexDirection: "row", gap: "40px"}}>
             <RobotInfoCard 
               icon={Timer}
               label="업타임" 
@@ -172,6 +194,9 @@ export default function FireRobotDetailSection({ robot, onClose, onDelete, onMov
               label="등록 일자" 
               value={robot.lastUpdate || "정보 없음"} 
             />
+            </div>
+
+            
           </div>
         </div>
 

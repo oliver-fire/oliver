@@ -34,8 +34,6 @@ export default function Section2({ onBack, onNext }: Props) {
           text="뒤로 가기"
           onClick={() => onBack?.()}
           variant="secondary"
-          width={103}
-          height={48}
         />
       </div>
     </div>
