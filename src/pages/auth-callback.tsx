@@ -25,15 +25,9 @@ export default function AuthCallback() {
 
         if (code) {
           try {
-            const response = await apiClient.get("/v1/auth/google/callback", {
+            await apiClient.get("/v1/auth/google/callback", {
               params: { code },
             });
-            
-            if (response.data?.accessToken || response.data?.data?.accessToken) {
-              const token = response.data?.accessToken || response.data?.data?.accessToken;
-              localStorage.setItem("accessToken", token);
-            }
-            
             navigate("/", { replace: true });
           } catch (error: any) {
             navigate("/login", { replace: true });
