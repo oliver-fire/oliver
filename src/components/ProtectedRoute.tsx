@@ -23,7 +23,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     checkAuth();
   }, []);
 
-  // 인증 상태 확인 중
   if (isAuthenticated === null) {
     return (
       <div style={{
@@ -39,12 +38,10 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // 인증되지 않은 경우 로그인 페이지로 리다이렉트
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // 인증된 경우 자식 컴포넌트 렌더링
   return <>{children}</>;
 }
 

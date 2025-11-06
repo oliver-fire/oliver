@@ -23,7 +23,7 @@ const GoogleIcon = () => (
     />
   </svg>
 );
-// 아니 왜 안올라가 버셀에?  
+
 export default function Login() {
   const navigate = useNavigate();
   const [isChecking, setIsChecking] = useState(true);
@@ -31,13 +31,9 @@ export default function Login() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // 이미 로그인되어 있는지 확인
-        // apiClient에 이미 withCredentials: true가 설정되어 있음
         await apiClient.get("/v1/auth/@me");
-        // 이미 로그인되어 있으면 홈으로 리다이렉트
         navigate("/", { replace: true });
       } catch (error) {
-        // 인증되지 않은 경우 로그인 페이지 유지
         setIsChecking(false);
       }
     };
@@ -53,7 +49,6 @@ export default function Login() {
     window.location.href = googleAuthUrl;
   };
 
-  // 인증 상태 확인 중
   if (isChecking) {
     return (
       <div style={{
