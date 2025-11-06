@@ -13,7 +13,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        console.log("인증 상태 확인 중...");
+        console.log("인증 상태 확인 중...", window.location.pathname);
         // 인증 상태 확인 API 호출
         // 백엔드에서 쿠키를 확인하여 인증 상태를 반환
         // apiClient에 이미 withCredentials: true가 설정되어 있음
@@ -22,9 +22,21 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         setIsAuthenticated(true);
       } catch (error: any) {
         // 401 에러 또는 인증 실패 시
-        console.log("인증 실패:", error.response?.status, error.response?.data);
-        // 401이 아닌 다른 에러도 인증 실패로 처리
-        setIsAuthenticated(false);
+        const status = error.response?.status;
+        console.log("인증 실패:", status, error.response?.data);
+        
+        // CORS 에러가 아닌 경우에만 인증 실패로 처리
+        if (status === 401) {
+          // 401은 인증되지 않은 상태이므로 로그인 페이지로 리다이렉트
+          setIsAuthenticated(false);
+        } else if (!error.response) {
+          // 네트워크 에러나 CORS 에러인 경우
+          console.error("네트워크 에러:", error.message);
+          setIsAuthenticated(false);
+        } else {
+          // 기타 에러
+          setIsAuthenticated(false);
+        }
       }
     };
 

@@ -54,7 +54,9 @@ export default function AuthCallback() {
             }
             
             // 쿠키가 주입되었으므로 홈으로 리다이렉트 (replace로 히스토리 정리)
-            console.log("홈으로 리다이렉트");
+            // 쿠키가 브라우저에 설정될 시간을 주기 위해 약간의 지연
+            console.log("로그인 성공, 홈으로 리다이렉트");
+            await new Promise(resolve => setTimeout(resolve, 100)); // 100ms 대기
             navigate("/", { replace: true });
           } catch (error: any) {
             console.error("로그인 처리 실패:", error);
