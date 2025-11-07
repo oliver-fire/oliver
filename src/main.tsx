@@ -84,6 +84,27 @@ Sentry.init({
   maxBreadcrumbs: 100, // 최대 브레드크럼 수
   maxValueLength: 10000, // 최대 값 길이
 
+  // 스택 트레이스 단순화: beforeSend에서 정리
+  beforeSend(event, _hint) {
+    // 스택 트레이스가 있는 경우 정리
+    if (event.exception?.values) {
+      event.exception.values = event.exception.values.map((exception) => {
+        // 스택 트레이스에서 불필요한 프레임 제거
+        if (exception.stacktrace?.frames) {
+          exception.stacktrace.frames = exception.stacktrace.frames.filter(
+            (_frame) => {
+              // 현재는 모든 프레임 유지 (커스텀 에러로 이미 단순화됨)
+              // 필요시 번들된 파일이나 node_modules 필터링 가능
+              return true;
+            },
+          );
+        }
+        return exception;
+      });
+    }
+    return event;
+  },
+
   // 모든 예외 기록
   ignoreErrors: [], // 필터링 없음
 
