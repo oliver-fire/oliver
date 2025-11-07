@@ -50,7 +50,7 @@ export default function Login() {
   }, [navigate]);
 
   const handleGoogleLogin = () => {
-    const backendUrl = "https://oliver-api.thnos.app";
+    const backendUrl = "https://oliver-api-staging.thnos.app/";
     const isLocal =
       window.location.hostname === "localhost" ||
       window.location.hostname === "127.0.0.1";

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import axios from "axios";
 
 let tokenCache: string | null = null;
@@ -46,10 +47,13 @@ const getToken = (): string | null => {
 };
 
 export const apiClient = axios.create({
-  baseURL: "https://oliver-api.thnos.app",
+  baseURL: "https://oliver-api-staging.thnos.app/",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
   },
   withCredentials: true,
 });
@@ -68,7 +72,24 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
-    return Promise.reject(error);
+    // Sentry에 요청 에러 기록
+    Sentry.captureException(error, {
+      tags: {
+        error_type: "api_request_error",
+        url: error.config?.url || "unknown",
+        method: error.config?.method?.toUpperCase() || "unknown",
+        message: error.message,
+      },
+      contexts: {
+        api: {
+          type: "request",
+          url: error.config?.url || "unknown",
+          method: error.config?.method?.toUpperCase() || "unknown",
+          message: error.message,
+        },
+      },
+    });
+    throw new Error(error.message);
   },
 );
 
@@ -86,7 +107,38 @@ apiClient.interceptors.response.use(
     console.error("Status:", error.response?.status);
     console.error("Error Data:", error.response?.data);
     console.error("Error Message:", error.message);
-    return Promise.reject(error);
+
+    // Sentry에 API 응답 에러 상세 기록
+    const errorContext: Sentry.Contexts = {
+      api: {
+        url: error.config?.url || "unknown",
+        method: error.config?.method?.toUpperCase() || "unknown",
+        status_code: error.response?.status || null,
+        response_data: error.response?.data || null,
+        request_headers: error.config?.headers || {},
+        response_headers: error.response?.headers || {},
+      },
+    };
+
+    Sentry.captureException(error, {
+      tags: {
+        error_type: "api_response_error",
+        http_status: error.response?.status?.toString() || "unknown",
+        api_url: error.config?.url || "unknown",
+        api_method: error.config?.method?.toUpperCase() || "unknown",
+      },
+      contexts: errorContext,
+      extra: {
+        full_url: error.config?.baseURL
+          ? `${error.config.baseURL}${error.config.url}`
+          : error.config?.url,
+        request_data: error.config?.data,
+        response_status_text: error.response?.statusText,
+        axios_error_code: error.code,
+      },
+    });
+
+    throw new Error(error.message);
   },
 );
 
