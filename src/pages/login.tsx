@@ -42,8 +42,8 @@ export default function Login() {
   }, [navigate]);
 
   const handleGoogleLogin = () => {
-    const backendUrl = import.meta.env.VITE_API_BASE_URL || "https://oliver-api.thnos.app";
-    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+    const backendUrl = "https://oliver-api.thnos.app";
+    const frontendUrl =  window.location.origin;
     const callbackUrl = `${frontendUrl}/auth/callback`;
     const googleAuthUrl = `${backendUrl}/v1/auth/google?callback=${encodeURIComponent(callbackUrl)}`;
     window.location.href = googleAuthUrl;

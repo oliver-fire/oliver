@@ -45,7 +45,7 @@ const getToken = (): string | null => {
 };
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "https://oliver-api.thnos.app",
+  baseURL: "https://oliver-api.thnos.app",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
