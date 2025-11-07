@@ -21,7 +21,7 @@ export function getAllBuildings(): Building[] {
 }
 
 export function getBuildingById(id: string): Building | undefined {
-  return buildings.find(building => building.id === id);
+  return buildings.find((building) => building.id === id);
 }
 
 export function addBuilding(building: Building): void {
@@ -29,7 +29,7 @@ export function addBuilding(building: Building): void {
 }
 
 export function updateBuilding(building: Building): void {
-  const index = buildings.findIndex(b => b.id === building.id);
+  const index = buildings.findIndex((b) => b.id === building.id);
   if (index !== -1) {
     buildings[index] = building;
   }
@@ -38,4 +38,3 @@ export function updateBuilding(building: Building): void {
 export function hasBuildings(): boolean {
   return buildings.length > 0;
 }
-

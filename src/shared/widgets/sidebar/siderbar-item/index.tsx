@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react";
+
 import s from "./styles.module.scss";
 
 interface Props {
@@ -8,7 +9,12 @@ interface Props {
   isActive: boolean;
 }
 
-export default function SidebarItem({ icon: Icon, text, href, isActive }: Props) {
+export default function SidebarItem({
+  icon: Icon,
+  text,
+  href,
+  isActive,
+}: Props) {
   return (
     <li className={s.item} data-active={isActive}>
       <a href={href} className={s.link}>

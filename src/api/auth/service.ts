@@ -40,8 +40,13 @@ export const login = async (data: LoginDto): Promise<LoginResponseDto> => {
 /**
  * 회원가입
  */
-export const register = async (data: RegisterDto): Promise<RegisterResponseDto> => {
-  const response = await apiClient.post<RegisterResponseDto>("/auth/register", data);
+export const register = async (
+  data: RegisterDto,
+): Promise<RegisterResponseDto> => {
+  const response = await apiClient.post<RegisterResponseDto>(
+    "/auth/register",
+    data,
+  );
   return response.data;
 };
 
@@ -59,6 +64,3 @@ export const refreshToken = async (): Promise<LoginResponseDto> => {
   const response = await apiClient.post<LoginResponseDto>("/auth/refresh");
   return response.data;
 };
-
-
-

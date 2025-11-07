@@ -1,6 +1,8 @@
 import { X } from "lucide-react";
+
 import Button from "@/shared/components/butoon";
 import Input from "@/shared/components/input";
+
 import s from "./styles.module.scss";
 
 interface MakeBuildProps {

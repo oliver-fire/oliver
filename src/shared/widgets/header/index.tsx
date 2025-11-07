@@ -1,5 +1,6 @@
-import {  Menu, Bell } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 import { IconButton } from "@/shared/components";
 
 import s from "./style.module.scss";
@@ -10,7 +11,11 @@ interface Props {
   onMenuClick?: () => void;
 }
 
-export default function Header({ leftContent, rightContent, onMenuClick }: Props) {
+export default function Header({
+  leftContent,
+  rightContent,
+  onMenuClick,
+}: Props) {
   const navigate = useNavigate();
 
   const handleProfileClick = () => {
@@ -20,15 +25,19 @@ export default function Header({ leftContent, rightContent, onMenuClick }: Props
   return (
     <header className={s.header}>
       <div className={s.actions}>
-        <IconButton icon={Menu} primary={false} onClick={onMenuClick || (() => {})} />
+        <IconButton
+          icon={Menu}
+          primary={false}
+          onClick={onMenuClick || (() => {})}
+        />
         <span className={s.title}>Oliver Dashboard</span>
         {leftContent}
       </div>
       <div className={s.actions}>
         {rightContent}
 
-          <IconButton icon={Bell} primary={false} onClick={() => {}} />
-          
+        <IconButton icon={Bell} primary={false} onClick={() => {}} />
+
         <img
           src="/sample/profile.png"
           alt="Oliver Profile"

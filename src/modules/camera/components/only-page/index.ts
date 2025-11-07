@@ -1,11 +1,9 @@
 export { default as MapSection } from "./map/mapsection";
 export { default as NoMapSection } from "./map/nomapsection";
-
+export { default as MakeBuildSection1 } from "./map/widgets/make-buiild/section-1";
+export { default as MakeBuildSection2 } from "./map/widgets/make-buiild/section-2";
+export { default as MakeBuildSection3 } from "./map/widgets/make-buiild/section-3";
 export { default as MakeRobotSection1 } from "./map/widgets/make-robot/section-1";
 export { default as MakeRobotSection2 } from "./map/widgets/make-robot/section-2";
 export { default as MakeRobotSection3 } from "./map/widgets/make-robot/section-3";
 export { default as VideoDetail } from "./map/widgets/video-detail";
-
-export { default as MakeBuildSection1 } from "./map/widgets/make-buiild/section-1";
-export { default as MakeBuildSection2 } from "./map/widgets/make-buiild/section-2";
-export { default as MakeBuildSection3 } from "./map/widgets/make-buiild/section-3";

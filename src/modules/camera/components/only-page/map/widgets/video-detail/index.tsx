@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+
 import s from "./styles.module.scss";
 
 interface Props {
@@ -30,12 +31,12 @@ export default function VideoDetail({ isOpen, onClose, videoInfo }: Props) {
             <source src="/sample/neo.mp4" type="video/mp4" />
           </video>
         </div>
-        
+
         <div className={s.bottomBar}>
           <div className={s.leftSection}>
-            <img 
-              src="/sample/fire-robot.svg" 
-              alt="로봇" 
+            <img
+              src="/sample/fire-robot.svg"
+              alt="로봇"
               className={s.robotIcon}
             />
             <div className={s.textGroup}>
@@ -45,9 +46,9 @@ export default function VideoDetail({ isOpen, onClose, videoInfo }: Props) {
           </div>
 
           <div className={s.centerSection}>
-            <img 
-              src="/sample/fire-robot.svg" 
-              alt="소방 로봇" 
+            <img
+              src="/sample/fire-robot.svg"
+              alt="소방 로봇"
               className={s.robotIcon}
             />
             <div className={s.textGroup}>
@@ -67,4 +68,3 @@ export default function VideoDetail({ isOpen, onClose, videoInfo }: Props) {
     </div>
   );
 }
-

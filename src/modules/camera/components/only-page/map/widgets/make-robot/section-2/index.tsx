@@ -1,5 +1,7 @@
 import { useEffect } from "react";
+
 import Button from "@/shared/components/butoon";
+
 import s from "./styles.module.scss";
 
 interface Props {
@@ -39,4 +41,3 @@ export default function Section2({ onBack, onNext }: Props) {
     </div>
   );
 }
-

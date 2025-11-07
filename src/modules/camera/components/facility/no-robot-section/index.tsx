@@ -1,5 +1,7 @@
-import Button from "@/shared/components/butoon";
 import { Plus } from "lucide-react";
+
+import Button from "@/shared/components/butoon";
+
 import s from "./styles.module.scss";
 
 interface Props {
@@ -14,13 +16,12 @@ export default function NoRobotSection({ onAddClick }: Props) {
         <p className={s.description}>
           아래 버튼을 눌러 Oliver 로봇을 등록해주세요
         </p>
-        <Button 
-          text="로봇 추가하기" 
-          leftIcon={Plus} 
-          onClick={() => onAddClick?.()} 
+        <Button
+          text="로봇 추가하기"
+          leftIcon={Plus}
+          onClick={() => onAddClick?.()}
         />
       </div>
     </div>
   );
 }
-

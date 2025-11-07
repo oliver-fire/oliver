@@ -1,7 +1,15 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { Camera, Emergency, Home, Login, Map, Settings, AuthCallback } from "@/pages";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import {
+  AuthCallback,
+  Camera,
+  Emergency,
+  Home,
+  Login,
+  Map,
+  Settings,
+} from "@/pages";
 
 export const router = createBrowserRouter([
   {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { RealtimeVideo } from "../../components";
 import { VideoDetail } from "../../components/only-page";
 
@@ -43,7 +44,7 @@ export default function VideoSection() {
           <RealtimeVideo />
         </div>
       </section>
-      
+
       {selectedVideo !== null && (
         <VideoDetail
           isOpen={true}

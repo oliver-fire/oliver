@@ -15,7 +15,13 @@ interface Props {
   height?: string | number;
 }
 
-export default function Segment({ items, selected, onChange, width, height }: Props) {
+export default function Segment({
+  items,
+  selected,
+  onChange,
+  width,
+  height,
+}: Props) {
   const containerStyle: React.CSSProperties = {
     width: typeof width === "number" ? `${width}px` : width,
   };

@@ -1,8 +1,11 @@
-import Button from "@/shared/components/butoon";
 import { Plus } from "lucide-react";
+
+import Button from "@/shared/components/butoon";
+
 import MakeBuild from "../widgets/make-buiild/section-1";
 import MakeBuildSection2 from "../widgets/make-buiild/section-2";
 import MakeBuildSection3 from "../widgets/make-buiild/section-3";
+
 import s from "./styles.module.scss";
 
 interface Building {
@@ -26,14 +29,14 @@ interface Props {
   onAddFloor: (buildingId: string, floorName: string) => Promise<void>;
 }
 
-export default function NoMapSection({ 
-  section, 
-  setSection, 
-  buildings, 
-  floors, 
-  maxFloorLevel, 
-  onFetchFloors, 
-  onAddFloor 
+export default function NoMapSection({
+  section,
+  setSection,
+  buildings,
+  floors,
+  maxFloorLevel,
+  onFetchFloors,
+  onAddFloor,
 }: Props) {
   const handleStartScan = () => {
     setTimeout(() => {
@@ -52,31 +55,27 @@ export default function NoMapSection({
               <br />
               건물을 추가하면 로봇의 작동 상태와 경로를 모니터링할 수 있습니다.
             </p>
-            <Button 
-              text="건물 추가하기" 
-              leftIcon={Plus} 
-              onClick={() => setSection(1)} 
+            <Button
+              text="건물 추가하기"
+              leftIcon={Plus}
+              onClick={() => setSection(1)}
             />
           </div>
         </div>
       )}
-      
+
       {section === 1 && (
-        <MakeBuild 
-          isOpen={true} 
+        <MakeBuild
+          isOpen={true}
           onClose={() => setSection(0)}
           onNext={() => setSection(2)}
         />
       )}
 
-      {section === 2 && (
-        <MakeBuildSection2 
-          onStartScan={handleStartScan}
-        />
-      )}
+      {section === 2 && <MakeBuildSection2 onStartScan={handleStartScan} />}
 
       {section === 3 && (
-        <MakeBuildSection3 
+        <MakeBuildSection3
           onComplete={() => {
             // TODO: 완료 로직
             console.log("스캔 완료");

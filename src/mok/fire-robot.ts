@@ -84,4 +84,3 @@ export const fireRobots: FireRobot[] = [
     lastUpdate: "2025년 7월 20일 10시 00분",
   },
 ];
-

@@ -1,9 +1,10 @@
 import apiClient from "../client";
+
 import {
+  DeleteDeviceResponseDto,
   DeviceDto,
   UpdateDeviceDto,
   UpdateDeviceResponseDto,
-  DeleteDeviceResponseDto,
 } from "./dto/device";
 
 // API 응답 래퍼 타입
@@ -26,15 +27,21 @@ export const getAllDevices = async (): Promise<DeviceDto[]> => {
  * 디바이스 ID로 조회
  */
 export const getDeviceById = async (deviceId: string): Promise<DeviceDto> => {
-  const response = await apiClient.get<ApiResponse<DeviceDto>>(`/v1/device/${deviceId}`);
+  const response = await apiClient.get<ApiResponse<DeviceDto>>(
+    `/v1/device/${deviceId}`,
+  );
   return response.data.data;
 };
 
 /**
  * 디바이스 타입별 조회
  */
-export const getDevicesByType = async (type: "robot" | "sensor"): Promise<DeviceDto[]> => {
-  const response = await apiClient.get<ApiResponse<DeviceDto[]>>(`/v1/device?type=${type}`);
+export const getDevicesByType = async (
+  type: "robot" | "sensor",
+): Promise<DeviceDto[]> => {
+  const response = await apiClient.get<ApiResponse<DeviceDto[]>>(
+    `/v1/device?type=${type}`,
+  );
   return response.data.data;
 };
 
@@ -43,17 +50,24 @@ export const getDevicesByType = async (type: "robot" | "sensor"): Promise<Device
  */
 export const updateDevice = async (
   deviceId: string,
-  data: UpdateDeviceDto
+  data: UpdateDeviceDto,
 ): Promise<UpdateDeviceResponseDto> => {
-  const response = await apiClient.patch<UpdateDeviceResponseDto>(`/devices/${deviceId}`, data);
+  const response = await apiClient.patch<UpdateDeviceResponseDto>(
+    `/devices/${deviceId}`,
+    data,
+  );
   return response.data;
 };
 
 /**
  * 디바이스 삭제
  */
-export const deleteDevice = async (deviceId: string): Promise<DeleteDeviceResponseDto> => {
-  const response = await apiClient.delete<DeleteDeviceResponseDto>(`/devices/${deviceId}`);
+export const deleteDevice = async (
+  deviceId: string,
+): Promise<DeleteDeviceResponseDto> => {
+  const response = await apiClient.delete<DeleteDeviceResponseDto>(
+    `/devices/${deviceId}`,
+  );
   return response.data;
 };
 
@@ -96,21 +110,28 @@ const FIXED_FLOOR_ID = "8b151b5c-65bf-46f4-8f69-f47f0a67812f";
 /**
  * 로봇 등록
  */
-export const registerRobot = async (name: string = "김똥개로봇"): Promise<DeviceDto> => {
+export const registerRobot = async (
+  name: string = "김똥개로봇",
+): Promise<DeviceDto> => {
   const data: RegisterDeviceDto = {
     id: getRandomId(),
     buildingId: FIXED_BUILDING_ID,
     floorId: FIXED_FLOOR_ID,
     name: name,
   };
-  const response = await apiClient.post<ApiResponse<DeviceDto>>("/v1/device/register/robot", data);
+  const response = await apiClient.post<ApiResponse<DeviceDto>>(
+    "/v1/device/register/robot",
+    data,
+  );
   return response.data.data;
 };
 
 /**
  * 센서 등록
  */
-export const registerSensor = async (name: string = "김똥개로봇"): Promise<DeviceDto> => {
+export const registerSensor = async (
+  name: string = "김똥개로봇",
+): Promise<DeviceDto> => {
   const data: RegisterDeviceDto = {
     id: getRandomId(),
     buildingId: FIXED_BUILDING_ID,
@@ -118,7 +139,9 @@ export const registerSensor = async (name: string = "김똥개로봇"): Promise<
     name: name,
     tuyaDeviceRegisterKey: "tuya-key-12345",
   };
-  const response = await apiClient.post<ApiResponse<DeviceDto>>("/v1/device/register/sensor", data);
+  const response = await apiClient.post<ApiResponse<DeviceDto>>(
+    "/v1/device/register/sensor",
+    data,
+  );
   return response.data.data;
 };
-

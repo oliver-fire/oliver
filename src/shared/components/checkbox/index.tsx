@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import { useState } from "react";
+
 import s from "./styles.module.scss";
 
 interface Props {
@@ -8,7 +9,11 @@ interface Props {
   onChange?: (checked: boolean) => void;
 }
 
-export default function Checkbox({ label, defaultChecked = false, onChange }: Props) {
+export default function Checkbox({
+  label,
+  defaultChecked = false,
+  onChange,
+}: Props) {
   const [checked, setChecked] = useState(defaultChecked);
 
   const handleToggle = () => {
@@ -19,7 +24,7 @@ export default function Checkbox({ label, defaultChecked = false, onChange }: Pr
 
   return (
     <label className={s.container}>
-      <div 
+      <div
         className={`${s.checkbox} ${checked ? s.checked : ""}`}
         onClick={handleToggle}
       >
@@ -29,4 +34,3 @@ export default function Checkbox({ label, defaultChecked = false, onChange }: Pr
     </label>
   );
 }
-

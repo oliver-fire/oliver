@@ -66,4 +66,3 @@ export const fireSensors: FireSensor[] = [
     lastUpdate: "2025년 7월 22일 09시 30분",
   },
 ];
-

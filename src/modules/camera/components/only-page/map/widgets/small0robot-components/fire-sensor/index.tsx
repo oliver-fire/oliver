@@ -10,27 +10,37 @@ interface Props {
   isOverlapped?: boolean;
 }
 
-export default function SmallFireSensor({ name, x = 0, y = 0, scale = 1, onMouseDown, onDoubleClick }: Props) {
+export default function SmallFireSensor({
+  name,
+  x = 0,
+  y = 0,
+  scale = 1,
+  onMouseDown,
+  onDoubleClick,
+}: Props) {
   return (
-    <div 
+    <div
       className={s.sensorCard}
       data-robot="true"
       style={{
-        position: 'absolute',
+        position: "absolute",
         left: `${x}px`,
         top: `${y}px`,
         zIndex: 2,
         transform: `scale(${scale})`,
-        transformOrigin: 'top left',
+        transformOrigin: "top left",
       }}
       onMouseDown={onMouseDown}
       onDoubleClick={onDoubleClick}
     >
       <div className={s.sensorImageContainer}>
-        <img src="/sample/fire-robot.svg" alt="화재 감지기" className={s.sensorImage} />
+        <img
+          src="/sample/fire-robot.svg"
+          alt="화재 감지기"
+          className={s.sensorImage}
+        />
       </div>
       <div className={s.sensorName}>{name}</div>
     </div>
   );
 }
-

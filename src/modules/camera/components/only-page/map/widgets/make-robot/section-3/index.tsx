@@ -1,6 +1,8 @@
-import { useState } from "react";
 import { ChevronRight } from "lucide-react";
+import { useState } from "react";
+
 import Button from "@/shared/components/butoon";
+
 import s from "./styles.module.scss";
 
 interface Props {
@@ -11,12 +13,12 @@ interface Props {
   onSearchAgain?: () => void;
 }
 
-export default function Section3({ 
-  robotType, 
+export default function Section3({
+  robotType,
   serialNumber = "OLV960XFH-X92AG",
   onConfirm,
   onExit,
-  onSearchAgain 
+  onSearchAgain,
 }: Props) {
   const robotTypeText = robotType === "robot" ? "소화 로봇" : "화재 감지기";
   const [isConfirmed, setIsConfirmed] = useState(false);
@@ -25,7 +27,7 @@ export default function Section3({
   const handleConfirm = () => {
     setIsConfirmed(true);
     onConfirm?.();
-    
+
     // 3초 후 나가기 버튼 표시
     setTimeout(() => {
       setShowExitButton(true);
@@ -93,4 +95,3 @@ export default function Section3({
     </div>
   );
 }
-

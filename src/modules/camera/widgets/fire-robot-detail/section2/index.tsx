@@ -1,11 +1,32 @@
+import {
+  BatteryFull,
+  BatteryLow,
+  Calendar,
+  FireExtinguisher,
+  Layers2,
+  Pencil,
+  Timer,
+  Trash2,
+  Wifi,
+  X,
+} from "lucide-react";
 import { useState } from "react";
+
 import { FireRobot, FireSensor } from "@/mok";
 import Button from "@/shared/components/butoon";
-import { Pencil, X, Trash2, Wifi, Timer, Calendar, BatteryLow, BatteryFull, Layers2, FireExtinguisher } from "lucide-react";
+
 import s from "./styles.module.scss";
 
 // 로봇 정보 카드 컴포넌트
-function RobotInfoCard({ label, value, icon: Icon }: { label: string; value: string; icon?: React.ElementType }) {
+function RobotInfoCard({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  icon?: React.ElementType;
+}) {
   return (
     <div className={s.infoCard}>
       <div className={s.infoCardHeader}>
@@ -49,7 +70,9 @@ function KeyRecordSection() {
             </div>
             <div className={s.recordText}>
               <p className={s.recordLabel}>배터리 부족</p>
-              <p className={s.recordDescription}>로봇의 배터리가 부족하여 충전 시작함 ㅅㄱ</p>
+              <p className={s.recordDescription}>
+                로봇의 배터리가 부족하여 충전 시작함 ㅅㄱ
+              </p>
             </div>
           </div>
           <p className={s.recordDate}>2025-08-19 12:11:24</p>
@@ -61,7 +84,9 @@ function KeyRecordSection() {
             </div>
             <div className={s.recordText}>
               <p className={s.recordLabel}>화재 상황 종료</p>
-              <p className={s.recordDescription}>로봇의 배터리가 부족하여 충전 시작함 ㅅㄱ</p>
+              <p className={s.recordDescription}>
+                로봇의 배터리가 부족하여 충전 시작함 ㅅㄱ
+              </p>
             </div>
           </div>
           <p className={s.recordDate}>2025-08-19 12:11:24</p>
@@ -79,7 +104,12 @@ interface FireSensorDetailSectionProps {
   onMoveBuilding?: () => void;
 }
 
-export default function FireSensorDetailSection({ sensor, onClose, onDelete, onMoveBuilding }: FireSensorDetailSectionProps) {
+export default function FireSensorDetailSection({
+  sensor,
+  onClose,
+  onDelete,
+  onMoveBuilding,
+}: FireSensorDetailSectionProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(sensor.name);
 
@@ -143,31 +173,31 @@ export default function FireSensorDetailSection({ sensor, onClose, onDelete, onM
         {/* 센서 정보 */}
         <div className={s.section}>
           <div className={s.infoGrid}>
-            
-            <div style={{ display: "flex", flexDirection: "row", gap: "40px"}}>
-            <RobotInfoCard 
-              icon={BatteryFull}
-              label="배터리" 
-              value={sensor.battery ? `${getBatteryStatus(sensor.battery)} (${sensor.battery}%)` : "정보 없음"} 
-            />
-            <RobotInfoCard icon={Wifi} label="통신 상태" value={sensor.status ? "좋음" : "정보 없음"} />
-            </div>
-           
-
-           <div style={{ display: "flex", flexDirection: "row", gap: "40px"}}>
-            <RobotInfoCard 
-              icon={Timer}
-              label="업타임" 
-              value="342일" 
-            />
-            <RobotInfoCard 
-              icon={Calendar}
-              label="등록 일자" 
-              value={sensor.lastUpdate || "정보 없음"} 
-            />
+            <div style={{ display: "flex", flexDirection: "row", gap: "40px" }}>
+              <RobotInfoCard
+                icon={BatteryFull}
+                label="배터리"
+                value={
+                  sensor.battery
+                    ? `${getBatteryStatus(sensor.battery)} (${sensor.battery}%)`
+                    : "정보 없음"
+                }
+              />
+              <RobotInfoCard
+                icon={Wifi}
+                label="통신 상태"
+                value={sensor.status ? "좋음" : "정보 없음"}
+              />
             </div>
 
-            
+            <div style={{ display: "flex", flexDirection: "row", gap: "40px" }}>
+              <RobotInfoCard icon={Timer} label="업타임" value="342일" />
+              <RobotInfoCard
+                icon={Calendar}
+                label="등록 일자"
+                value={sensor.lastUpdate || "정보 없음"}
+              />
+            </div>
           </div>
         </div>
 
@@ -197,4 +227,3 @@ export default function FireSensorDetailSection({ sensor, onClose, onDelete, onM
     </div>
   );
 }
-

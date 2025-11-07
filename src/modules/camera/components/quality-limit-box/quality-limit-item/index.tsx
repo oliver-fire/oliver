@@ -1,4 +1,5 @@
 import classNames from "classnames";
+
 import s from "./styles.module.scss";
 
 interface Props {
@@ -7,9 +8,13 @@ interface Props {
   onClick?: () => void;
 }
 
-export default function QualityLimitItem({ text, isSelected = false, onClick }: Props) {
+export default function QualityLimitItem({
+  text,
+  isSelected = false,
+  onClick,
+}: Props) {
   return (
-    <div 
+    <div
       className={classNames(s.container, { [s.selected]: isSelected })}
       onClick={onClick}
     >

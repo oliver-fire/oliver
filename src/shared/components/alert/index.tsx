@@ -1,6 +1,8 @@
-import { Layers2, ArrowRight} from "lucide-react";
-import s from "./styles.module.scss";
+import { ArrowRight, Layers2 } from "lucide-react";
+
 import Button from "../butoon";
+
+import s from "./styles.module.scss";
 
 interface Props {
   title: string;
@@ -10,11 +12,11 @@ interface Props {
   onClose?: () => void;
 }
 
-export default function Alert({ 
-  title, 
-  message, 
-  buttonText = "페이지로 이동", 
-  onButtonClick
+export default function Alert({
+  title,
+  message,
+  buttonText = "페이지로 이동",
+  onButtonClick,
 }: Props) {
   return (
     <div className={s.alert}>
@@ -28,9 +30,13 @@ export default function Alert({
         </div>
       </div>
       <div className={s.actions}>
-        <Button text={buttonText} onClick={onButtonClick} rightIcon={ArrowRight} variant="primary" />
+        <Button
+          text={buttonText}
+          onClick={onButtonClick}
+          rightIcon={ArrowRight}
+          variant="primary"
+        />
       </div>
     </div>
   );
 }
-

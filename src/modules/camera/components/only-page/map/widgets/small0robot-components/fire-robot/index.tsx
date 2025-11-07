@@ -10,9 +10,9 @@ interface Props {
   isOverlapped?: boolean;
 }
 
-export default function SmallFireRobot({ 
-  name, 
-  x = 0, 
+export default function SmallFireRobot({
+  name,
+  x = 0,
   y = 0,
   scale = 1,
   onMouseDown,
@@ -20,25 +20,28 @@ export default function SmallFireRobot({
   isOverlapped,
 }: Props) {
   return (
-    <div 
+    <div
       className={`${s.robotCard} ${isOverlapped ? s.overlapped : ""}`}
       data-robot="true"
       style={{
-        position: 'absolute',
+        position: "absolute",
         left: `${x}px`,
         top: `${y}px`,
         zIndex: 1,
         transform: `scale(${scale})`,
-        transformOrigin: 'top left',
+        transformOrigin: "top left",
       }}
       onMouseDown={onMouseDown}
       onDoubleClick={onDoubleClick}
     >
       <div className={s.robotImageContainer}>
-        <img src="/sample/fire-robot.svg" alt="소화 로봇" className={s.robotImage} />
+        <img
+          src="/sample/fire-robot.svg"
+          alt="소화 로봇"
+          className={s.robotImage}
+        />
       </div>
       <div className={s.robotName}>{name}</div>
     </div>
   );
 }
-

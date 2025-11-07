@@ -39,7 +39,3 @@ export interface BuildingResponseDto {
   message: string;
   data?: BuildingDto;
 }
-
-
-
-

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+
 import s from "./styles.module.scss";
 
 interface Props {
@@ -8,7 +9,12 @@ interface Props {
   onMapScaleChange?: (scale: number) => void;
 }
 
-export default function MapViewer({ zoomLevel, mapOffset = { x: 0, y: 0 }, children, onMapScaleChange }: Props) {
+export default function MapViewer({
+  zoomLevel,
+  mapOffset = { x: 0, y: 0 },
+  children,
+  onMapScaleChange,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -23,11 +29,11 @@ export default function MapViewer({ zoomLevel, mapOffset = { x: 0, y: 0 }, child
     img.crossOrigin = "anonymous";
     img.onload = () => {
       console.log("이미지 로드됨:", img.width, "x", img.height);
-      
+
       // 고정 크기로 설정
       const baseWidth = 1200;
       const baseHeight = 600;
-      
+
       // 줌 레벨에 따라 크기 조정
       const scale = zoomLevel / 100;
       const width = baseWidth * scale;
@@ -38,13 +44,13 @@ export default function MapViewer({ zoomLevel, mapOffset = { x: 0, y: 0 }, child
 
       // 캔버스에 이미지 그리기
       ctx.drawImage(img, 0, 0, width, height);
-      
+
       // 스케일 변경 알림
       if (onMapScaleChange) {
         onMapScaleChange(scale);
       }
     };
-    
+
     img.onerror = () => {
       console.error("이미지 로드 실패");
     };
@@ -54,17 +60,18 @@ export default function MapViewer({ zoomLevel, mapOffset = { x: 0, y: 0 }, child
 
   return (
     <div className={s.mapContainer}>
-      <canvas 
-        ref={canvasRef} 
+      <canvas
+        ref={canvasRef}
         className={s.mapCanvas}
         style={{
           transform: `translate(${mapOffset.x}px, ${mapOffset.y}px)`,
         }}
       />
-      <div style={{ transform: `translate(${mapOffset.x}px, ${mapOffset.y}px)` }}>
+      <div
+        style={{ transform: `translate(${mapOffset.x}px, ${mapOffset.y}px)` }}
+      >
         {children}
       </div>
     </div>
   );
 }
-

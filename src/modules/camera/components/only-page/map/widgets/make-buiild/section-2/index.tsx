@@ -1,6 +1,8 @@
-import { useState } from "react";
 import { ChevronDown, Radar } from "lucide-react";
+import { useState } from "react";
+
 import Button from "@/shared/components/butoon";
+
 // TODO: API에서 디바이스 데이터 가져오기
 // import { getAllDevices } from "@/api";
 import s from "./styles.module.scss";
@@ -12,10 +14,13 @@ interface Props {
 export default function MakeBuildSection2({ onStartScan }: Props) {
   const [selectedRobotId] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  
+
   // TODO: API에서 디바이스 데이터 가져오기
   const fireRobots: any[] = [];
-  const selectedRobot = fireRobots.find(robot => robot.id === selectedRobotId) || fireRobots[0] || null;
+  const selectedRobot =
+    fireRobots.find((robot) => robot.id === selectedRobotId) ||
+    fireRobots[0] ||
+    null;
 
   const handleStartScan = () => {
     setIsScanning(true);
@@ -26,7 +31,9 @@ export default function MakeBuildSection2({ onStartScan }: Props) {
     <div className={s.container}>
       <div className={s.header}>
         <h1 className={s.title}>
-          {isScanning ? "LiDAR 센서로 주변 공간 구조를 스캔중입니다" : "주변 공간 정보가 수집되지 않았습니다"}
+          {isScanning
+            ? "LiDAR 센서로 주변 공간 구조를 스캔중입니다"
+            : "주변 공간 정보가 수집되지 않았습니다"}
         </h1>
         <div className={s.instructionGroup}>
           {isScanning ? (
@@ -36,11 +43,14 @@ export default function MakeBuildSection2({ onStartScan }: Props) {
           ) : (
             <>
               <p className={s.instruction}>
-                스캔을 시작하면 로봇이 Oliver LiDAR 센서를 이용해 주변 공간 구조를 인식하고 지도를 생성합니다.
+                스캔을 시작하면 로봇이 Oliver LiDAR 센서를 이용해 주변 공간
+                구조를 인식하고 지도를 생성합니다.
               </p>
               <p className={s.instruction}>
                 <span>스캔 중에는 </span>
-                <span className={s.instructionWarning}>물체를 이동시키거나 사람이 이동하지 않도록 주의해주세요.</span>
+                <span className={s.instructionWarning}>
+                  물체를 이동시키거나 사람이 이동하지 않도록 주의해주세요.
+                </span>
               </p>
               <p className={s.instruction}>
                 아래에서 건물 스캔에 사용할 로봇을 선택하세요.
@@ -50,7 +60,8 @@ export default function MakeBuildSection2({ onStartScan }: Props) {
         </div>
         {isScanning && (
           <div className={s.estimatedTime}>
-            <span className={s.estimatedTimeLabel}>예상 소요 시간:</span> <span className={s.estimatedTimeHighlight}>2시간 이상</span>
+            <span className={s.estimatedTimeLabel}>예상 소요 시간:</span>{" "}
+            <span className={s.estimatedTimeHighlight}>2시간 이상</span>
           </div>
         )}
       </div>
@@ -61,7 +72,11 @@ export default function MakeBuildSection2({ onStartScan }: Props) {
         </div>
         <div className={s.robotInfo}>
           <h3 className={s.robotName}>{selectedRobot?.name || "로봇 선택"}</h3>
-          <p className={s.robotDetails}>{selectedRobot ? `${selectedRobot.model}·배터리 ${selectedRobot.battery}%` : "로봇을 선택해주세요"}</p>
+          <p className={s.robotDetails}>
+            {selectedRobot
+              ? `${selectedRobot.model}·배터리 ${selectedRobot.battery}%`
+              : "로봇을 선택해주세요"}
+          </p>
         </div>
         {!isScanning && (
           <div className={s.dropdownIcon}>
@@ -72,7 +87,9 @@ export default function MakeBuildSection2({ onStartScan }: Props) {
 
       {!isScanning && (
         <div className={s.estimatedTime}>
-          <span className={s.estimatedTimeLabel}>예상 시간:</span> 소형 공간 <span className={s.estimatedTimeHighlight}>20분</span>, 대형 공간 <span className={s.estimatedTimeHighlight}>2시간 이상</span>
+          <span className={s.estimatedTimeLabel}>예상 시간:</span> 소형 공간{" "}
+          <span className={s.estimatedTimeHighlight}>20분</span>, 대형 공간{" "}
+          <span className={s.estimatedTimeHighlight}>2시간 이상</span>
         </div>
       )}
 
@@ -88,4 +105,3 @@ export default function MakeBuildSection2({ onStartScan }: Props) {
     </div>
   );
 }
-

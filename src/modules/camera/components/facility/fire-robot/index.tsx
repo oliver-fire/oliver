@@ -1,7 +1,16 @@
 // TODO: API DTO 타입 사용
 // import { DeviceDto } from "@/api";
+import {
+  AlertTriangle,
+  BatteryCharging,
+  BellElectric,
+  CheckCircle,
+  FireExtinguisher,
+  Loader,
+  XCircle,
+} from "lucide-react";
+
 import s from "./styles.module.scss";
-import { Loader, BatteryCharging, BellElectric, FireExtinguisher, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 
 // TODO: DeviceDto 타입으로 변경
 interface Props {
@@ -68,22 +77,26 @@ const getBatteryConfig = (battery: number) => {
   if (battery >= 60) {
     return {
       color: "#48B842",
-      bgColor: "#E0F7E3"
+      bgColor: "#E0F7E3",
     };
   }
   if (battery >= 30) {
     return {
       color: "#FF8C00",
-      bgColor: "#FFF3E0"
+      bgColor: "#FFF3E0",
     };
   }
   return {
     color: "#FF4842",
-    bgColor: "#FFE5E5"
+    bgColor: "#FFE5E5",
   };
 };
 
-export default function FireRobotItem({ robot, onSelect, isSelected = false }: Props) {
+export default function FireRobotItem({
+  robot,
+  onSelect,
+  isSelected = false,
+}: Props) {
   const statusConfig = getStatusConfig(robot.status);
   const StatusIcon = statusConfig.icon;
   const batteryConfig = getBatteryConfig(robot.battery);
@@ -95,12 +108,16 @@ export default function FireRobotItem({ robot, onSelect, isSelected = false }: P
   };
 
   return (
-    <div 
-      className={`${s.robotItem} ${isSelected ? s.selected : ''}`}
+    <div
+      className={`${s.robotItem} ${isSelected ? s.selected : ""}`}
       onClick={handleClick}
     >
       <div className={s.left}>
-        <img src="/sample/fire-robot.svg" alt="소방 로봇" className={s.robotImage} />
+        <img
+          src="/sample/fire-robot.svg"
+          alt="소방 로봇"
+          className={s.robotImage}
+        />
         <div className={s.info}>
           <h3 className={s.name}>{robot.name}</h3>
           <p className={s.model}>{robot.model}</p>
@@ -108,11 +125,11 @@ export default function FireRobotItem({ robot, onSelect, isSelected = false }: P
       </div>
 
       <div className={s.statusWrapper}>
-        <div 
+        <div
           className={s.statusBox}
-          style={{ 
+          style={{
             backgroundColor: statusConfig.bgColor,
-            color: statusConfig.textColor
+            color: statusConfig.textColor,
           }}
         >
           <StatusIcon size={16} />
@@ -121,19 +138,19 @@ export default function FireRobotItem({ robot, onSelect, isSelected = false }: P
       </div>
 
       <div className={s.battery}>
-        <div 
+        <div
           className={s.batteryBar}
           style={{ backgroundColor: batteryConfig.bgColor }}
         >
-          <div 
-            className={s.batteryFill} 
-            style={{ 
+          <div
+            className={s.batteryFill}
+            style={{
               width: `${robot.battery}%`,
-              backgroundColor: batteryConfig.color 
+              backgroundColor: batteryConfig.color,
             }}
           />
         </div>
-        
+
         <span className={s.batteryText} style={{ color: batteryConfig.color }}>
           {robot.battery}%
         </span>
@@ -145,4 +162,3 @@ export default function FireRobotItem({ robot, onSelect, isSelected = false }: P
     </div>
   );
 }
-

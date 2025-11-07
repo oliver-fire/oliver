@@ -1,15 +1,36 @@
-import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Layers2, Minus, Plus, Search, Plus as PlusIcon, Settings, Radar, X, Check, Pencil, Trash2, Check as CheckIcon } from "lucide-react";
+import {
+  Check,
+  Check as CheckIcon,
+  ChevronDown,
+  Layers2,
+  Minus,
+  Pencil,
+  Plus,
+  Plus as PlusIcon,
+  Radar,
+  Search,
+  Settings,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+import {
+  FireRobotDetailSection1,
+  FireSensorDetailSection2,
+} from "@/modules/camera/widgets";
+import { FireRobot } from "@/mok/fire-robot";
+import { FireSensor } from "@/mok/fire-sensor";
 import Button from "@/shared/components/butoon";
-import s from "./styles.module.scss";
+
+import { SmallFireRobot, SmallFireSensor } from "../../small0robot-components";
+
 // TODO: API에서 데이터 가져오기
 // import { getAllBuildings, updateBuilding, getAllDevices } from "@/api";
 // import { BuildingDto, DeviceDto } from "@/api";
 import MapViewer from "./map-viewer";
-import { SmallFireRobot, SmallFireSensor } from "../../small0robot-components";
-import { FireRobotDetailSection1, FireSensorDetailSection2 } from "@/modules/camera/widgets";
-import { FireRobot } from "@/mok/fire-robot";
-import { FireSensor } from "@/mok/fire-sensor";
+
+import s from "./styles.module.scss";
 
 interface Robot {
   id: string;
@@ -40,27 +61,31 @@ interface Props {
   onAddFloor: (buildingId: string, floorName: string) => Promise<void>;
 }
 
-export default function MakeBuildSection3({ 
-  onComplete: _onComplete, 
+export default function MakeBuildSection3({
+  onComplete: _onComplete,
   onAddSpace,
   buildings,
   floors,
   maxFloorLevel: _maxFloorLevel,
   onFetchFloors: _onFetchFloors,
-  onAddFloor: _onAddFloor
+  onAddFloor: _onAddFloor,
 }: Props) {
   const [zoomLevel, setZoomLevel] = useState(50);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedFloor, setSelectedFloor] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedBuildingId, setSelectedBuildingId] = useState<string | null>(null);
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string | null>(
+    null,
+  );
   const [robots, setRobots] = useState<Robot[]>([]);
   const [mapOffset, setMapOffset] = useState({ x: 0, y: 0 });
   const [isMapDragging, setIsMapDragging] = useState(false);
   const [draggedRobotId, setDraggedRobotId] = useState<string | null>(null);
   const [mapScale, setMapScale] = useState(1);
   const [showProductSelector, setShowProductSelector] = useState(false);
-  const [selectedProductType, setSelectedProductType] = useState<"robot" | "sensor">("robot");
+  const [selectedProductType, setSelectedProductType] = useState<
+    "robot" | "sensor"
+  >("robot");
   const [selectedRobotId, setSelectedRobotId] = useState<string | null>(null);
   const [showManagementModal, setShowManagementModal] = useState(false);
   const [editingFloor, setEditingFloor] = useState<string | null>(null);
@@ -81,7 +106,7 @@ export default function MakeBuildSection3({
   useEffect(() => {
     mapScaleRef.current = mapScale;
   }, [mapScale]);
-  
+
   useEffect(() => {
     if (buildings.length > 0) {
       const firstBuilding = buildings[0];
@@ -90,15 +115,15 @@ export default function MakeBuildSection3({
       console.log("Building ID:", firstBuilding.id);
       console.log("Building Name:", firstBuilding.name);
       console.log("All Buildings:", buildings);
-      
+
       if (floors.length > 0) {
         setSelectedFloor(floors[0].name);
       }
     }
   }, [buildings, floors]);
-  
-  const currentBuilding = buildings.find(b => b.id === selectedBuildingId);
-  
+
+  const currentBuilding = buildings.find((b) => b.id === selectedBuildingId);
+
   const filteredFloors = floors.filter((floor: Floor) => {
     return floor.name.toLowerCase().includes(searchQuery.toLowerCase());
   });
@@ -108,18 +133,19 @@ export default function MakeBuildSection3({
     const currentScale = mapScale || 1;
     const robotWidth = 100 * currentScale;
     const robotHeight = 100 * currentScale;
-    
+
     // 같은 위치에 다른 로봇이 있는지 확인 (화재감지기)
-    return robots.some(r => 
-      r.id !== robot.id && 
-      r.type === "sensor" &&
-      Math.abs((r.x * currentScale) - (robot.x * currentScale)) < robotWidth && 
-      Math.abs((r.y * currentScale) - (robot.y * currentScale)) < robotHeight
+    return robots.some(
+      (r) =>
+        r.id !== robot.id &&
+        r.type === "sensor" &&
+        Math.abs(r.x * currentScale - robot.x * currentScale) < robotWidth &&
+        Math.abs(r.y * currentScale - robot.y * currentScale) < robotHeight,
     );
   };
 
   const handleMapMouseDown = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('[data-robot]')) return;
+    if ((e.target as HTMLElement).closest("[data-robot]")) return;
     setIsMapDragging(true);
     const startPos = { x: e.clientX - mapOffset.x, y: e.clientY - mapOffset.y };
     dragStartRef.current = startPos;
@@ -128,7 +154,7 @@ export default function MakeBuildSection3({
   const handleRobotMouseDown = (e: React.MouseEvent, robotId: string) => {
     e.stopPropagation();
     setDraggedRobotId(robotId);
-    const robot = robotsRef.current.find(r => r.id === robotId);
+    const robot = robotsRef.current.find((r) => r.id === robotId);
     if (!robot) return;
     const startPos = {
       x: e.clientX - robot.x * mapScaleRef.current,
@@ -157,12 +183,12 @@ export default function MakeBuildSection3({
     if (!selectedBuildingId || !editingFloor) return;
     // TODO: API로 층 이름 업데이트
     // await updateFloor(selectedBuildingId, floorId, { name: editedFloorName });
-    
+
     // selectedFloor도 업데이트
     if (selectedFloor === editingFloor) {
       setSelectedFloor(editedFloorName);
     }
-    
+
     setEditingFloor(null);
     setEditedFloorName("");
   };
@@ -171,9 +197,9 @@ export default function MakeBuildSection3({
     if (!selectedBuildingId) return;
     // TODO: API로 층 삭제
     // await deleteFloor(selectedBuildingId, floorId);
-    
+
     // 선택된 층이 삭제되면 첫 번째 층으로 변경
-    const remainingFloors = floors.filter(f => f.name !== floorToDelete);
+    const remainingFloors = floors.filter((f) => f.name !== floorToDelete);
     if (selectedFloor === floorToDelete && remainingFloors.length > 0) {
       setSelectedFloor(remainingFloors[0].name);
     }
@@ -186,16 +212,18 @@ export default function MakeBuildSection3({
 
   const getSelectedRobotDetail = () => {
     if (!selectedRobotId) return null;
-    const robot = robots.find(r => r.id === selectedRobotId);
+    const robot = robots.find((r) => r.id === selectedRobotId);
     if (!robot) return null;
-    
+
     // TODO: API에서 디바이스 상세 정보 가져오기
     // return await getDeviceById(selectedRobotId);
     return robot;
   };
 
   const selectedRobotDetail = getSelectedRobotDetail();
-  const isFireRobot = selectedRobotDetail && robots.find(r => r.id === selectedRobotId)?.type === "robot";
+  const isFireRobot =
+    selectedRobotDetail &&
+    robots.find((r) => r.id === selectedRobotId)?.type === "robot";
 
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
@@ -208,9 +236,13 @@ export default function MakeBuildSection3({
       if (draggedRobotIdRef.current) {
         const newX = (e.clientX - dragStartRef.current.x) / mapScaleRef.current;
         const newY = (e.clientY - dragStartRef.current.y) / mapScaleRef.current;
-        setRobots(robotsRef.current.map(robot =>
-          robot.id === draggedRobotIdRef.current ? { ...robot, x: newX, y: newY } : robot
-        ));
+        setRobots(
+          robotsRef.current.map((robot) =>
+            robot.id === draggedRobotIdRef.current
+              ? { ...robot, x: newX, y: newY }
+              : robot,
+          ),
+        );
       }
     };
 
@@ -219,12 +251,12 @@ export default function MakeBuildSection3({
       setDraggedRobotId(null);
     };
 
-    document.addEventListener('mousemove', handleGlobalMouseMove);
-    document.addEventListener('mouseup', handleGlobalMouseUp);
+    document.addEventListener("mousemove", handleGlobalMouseMove);
+    document.addEventListener("mouseup", handleGlobalMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+      document.removeEventListener("mouseup", handleGlobalMouseUp);
     };
   }, [isMapDragging]);
 
@@ -232,7 +264,7 @@ export default function MakeBuildSection3({
     <div className={s.container}>
       <div className={s.controlBar}>
         <div className={s.buildingSelectorWrapper}>
-          <button 
+          <button
             className={s.buildingSelector}
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
@@ -253,7 +285,7 @@ export default function MakeBuildSection3({
               <div className={s.searchSection}>
                 <div className={s.searchInput}>
                   <Search size={18} className={s.searchIcon} />
-                  <input 
+                  <input
                     type="text"
                     placeholder="검색하기"
                     value={searchQuery}
@@ -283,7 +315,7 @@ export default function MakeBuildSection3({
 
               {/* Action Buttons Section */}
               <div className={s.actionSection}>
-                <button 
+                <button
                   className={s.actionButton}
                   onClick={() => {
                     setIsDropdownOpen(false);
@@ -293,7 +325,7 @@ export default function MakeBuildSection3({
                   <PlusIcon size={16} />
                   <span>공간 추가</span>
                 </button>
-                <button 
+                <button
                   className={s.actionButton}
                   onClick={() => {
                     setIsDropdownOpen(false);
@@ -309,20 +341,18 @@ export default function MakeBuildSection3({
         </div>
 
         <div className={s.zoomControls}>
-          <button 
+          <button
             className={s.invertedButton}
             onClick={() => setZoomLevel(Math.max(0, zoomLevel - 10))}
           >
             <Minus size={20} />
           </button>
-          <button className={s.zoomDisplay}>
-            {zoomLevel}%
-          </button>
-          <button 
+          <button className={s.zoomDisplay}>{zoomLevel}%</button>
+          <button
             className={s.invertedButton}
             onClick={() => setZoomLevel(Math.min(200, zoomLevel + 10))}
           >
-            <Plus size={20} /> 
+            <Plus size={20} />
           </button>
         </div>
       </div>
@@ -332,9 +362,14 @@ export default function MakeBuildSection3({
         onWheel={handleWheel}
         style={{ width: "100%", height: "100%" }}
       >
-        <MapViewer zoomLevel={zoomLevel} mapOffset={mapOffset} onMapScaleChange={setMapScale}>
+        <MapViewer
+          zoomLevel={zoomLevel}
+          mapOffset={mapOffset}
+          onMapScaleChange={setMapScale}
+        >
           {robots.map((robot) => {
-            const RobotComponent = robot.type === "sensor" ? SmallFireSensor : SmallFireRobot;
+            const RobotComponent =
+              robot.type === "sensor" ? SmallFireSensor : SmallFireRobot;
             const isOverlapped = checkOverlap(robot);
             const currentScale = mapScale || 1;
             return (
@@ -368,11 +403,14 @@ export default function MakeBuildSection3({
 
       {showProductSelector && (
         <>
-          <div className={s.overlay} onClick={() => setShowProductSelector(false)} />
+          <div
+            className={s.overlay}
+            onClick={() => setShowProductSelector(false)}
+          />
           <div className={s.productSelectorWidget}>
             <div className={s.productSelectorHeader}>
               <h2 className={s.productSelectorTitle}>제품 선택</h2>
-              <button 
+              <button
                 className={s.closeButton}
                 onClick={() => setShowProductSelector(false)}
               >
@@ -381,12 +419,14 @@ export default function MakeBuildSection3({
             </div>
 
             <div className={s.productCards}>
-              <div 
+              <div
                 className={`${s.productCard} ${selectedProductType === "robot" ? s.selected : ""}`}
                 onClick={() => setSelectedProductType("robot")}
               >
                 <h3 className={s.productCardTitle}>소화 로봇</h3>
-                <p className={s.productCardDescription}>화재가 발생하였을 때 초기 진압을 하는 로봇입니다</p>
+                <p className={s.productCardDescription}>
+                  화재가 발생하였을 때 초기 진압을 하는 로봇입니다
+                </p>
                 <div className={s.productCardImage}>
                   <img src="/sample/fire-robot.svg" alt="소화 로봇" />
                 </div>
@@ -401,12 +441,14 @@ export default function MakeBuildSection3({
                 </div>
               </div>
 
-              <div 
+              <div
                 className={`${s.productCard} ${selectedProductType === "sensor" ? s.selected : ""}`}
                 onClick={() => setSelectedProductType("sensor")}
               >
                 <h3 className={s.productCardTitle}>화재 감지기</h3>
-                <p className={s.productCardDescription}>올리버 시스템과 연동되어 화재를 감지합니다</p>
+                <p className={s.productCardDescription}>
+                  올리버 시스템과 연동되어 화재를 감지합니다
+                </p>
                 <div className={s.productCardImage}>
                   <img src="/sample/fire-robot.svg" alt="화재 감지기" />
                 </div>
@@ -431,7 +473,7 @@ export default function MakeBuildSection3({
                   const baseX = 100 / currentScale;
                   const baseY = 100 / currentScale;
                   const spacing = 10 / currentScale;
-                  
+
                   const newRobot: Robot = {
                     id: `robot-${Date.now()}`,
                     name: selectedProductType === "robot" ? "RX-780" : "FS-101",
@@ -451,7 +493,7 @@ export default function MakeBuildSection3({
       {selectedRobotId && selectedRobotDetail && (
         <>
           {/* 오버레이 */}
-          <div 
+          <div
             style={{
               position: "fixed",
               top: 0,
@@ -463,7 +505,7 @@ export default function MakeBuildSection3({
             }}
             onClick={() => setSelectedRobotId(null)}
           />
-          
+
           {/* 위젯 */}
           <div
             style={{
@@ -478,21 +520,21 @@ export default function MakeBuildSection3({
             }}
           >
             {isFireRobot ? (
-              <FireRobotDetailSection1 
+              <FireRobotDetailSection1
                 robot={selectedRobotDetail as unknown as FireRobot}
                 onClose={() => setSelectedRobotId(null)}
                 onDelete={() => {
-                  setRobots(robots.filter(r => r.id !== selectedRobotId));
+                  setRobots(robots.filter((r) => r.id !== selectedRobotId));
                   setSelectedRobotId(null);
                 }}
                 onMoveBuilding={handleMoveBuilding}
               />
             ) : (
-              <FireSensorDetailSection2 
+              <FireSensorDetailSection2
                 sensor={selectedRobotDetail as unknown as FireSensor}
                 onClose={() => setSelectedRobotId(null)}
                 onDelete={() => {
-                  setRobots(robots.filter(r => r.id !== selectedRobotId));
+                  setRobots(robots.filter((r) => r.id !== selectedRobotId));
                   setSelectedRobotId(null);
                 }}
                 onMoveBuilding={handleMoveBuilding}
@@ -504,11 +546,14 @@ export default function MakeBuildSection3({
 
       {showManagementModal && currentBuilding && (
         <>
-          <div className={s.overlay} onClick={() => setShowManagementModal(false)} />
+          <div
+            className={s.overlay}
+            onClick={() => setShowManagementModal(false)}
+          />
           <div className={s.managementModal}>
             <div className={s.managementHeader}>
               <h2 className={s.managementTitle}>공간 관리하기</h2>
-              <button 
+              <button
                 className={s.closeButton}
                 onClick={() => setShowManagementModal(false)}
               >
@@ -522,37 +567,42 @@ export default function MakeBuildSection3({
                   <div key={floor.id} className={s.managementFloorItem}>
                     <div className={s.managementFloorLeft}>
                       <div className={s.managementFloorInfo}>
-                      <div className={s.managementFloorLeftTop}>
-                      <div className={s.managementFloorIcon}>
-                        <Layers2 size={26} />
-                      </div>
-                      {editingFloor === floor.name ? (
-                        <input
-                          type="text"
-                          value={editedFloorName}
-                          onChange={(e) => setEditedFloorName(e.target.value)}
-                          className={s.managementFloorNameInput}
-                          autoFocus
-                        />
-                      ) : (
-                        <div className={s.managementFloorName}>{floor.name}</div>
-                      )}
-                      </div>
-                      
-                       
-                        <div className={s.managementFloorAddress}>{currentBuilding.name}</div>
+                        <div className={s.managementFloorLeftTop}>
+                          <div className={s.managementFloorIcon}>
+                            <Layers2 size={26} />
+                          </div>
+                          {editingFloor === floor.name ? (
+                            <input
+                              type="text"
+                              value={editedFloorName}
+                              onChange={(e) =>
+                                setEditedFloorName(e.target.value)
+                              }
+                              className={s.managementFloorNameInput}
+                              autoFocus
+                            />
+                          ) : (
+                            <div className={s.managementFloorName}>
+                              {floor.name}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className={s.managementFloorAddress}>
+                          {currentBuilding.name}
+                        </div>
                       </div>
                     </div>
                     <div className={s.managementFloorActions}>
                       {editingFloor === floor.name ? (
-                        <button 
+                        <button
                           className={s.managementSaveButton}
                           onClick={handleSaveFloor}
                         >
                           <CheckIcon size={24} />
                         </button>
                       ) : (
-                        <button 
+                        <button
                           className={s.managementEditButton}
                           onClick={() => handleEditFloor(floor.name)}
                         >
@@ -560,7 +610,7 @@ export default function MakeBuildSection3({
                         </button>
                       )}
                       {editingFloor !== floor.name && (
-                        <button 
+                        <button
                           className={s.managementDeleteButton}
                           onClick={() => handleDeleteFloor(floor.name)}
                         >
@@ -572,12 +622,10 @@ export default function MakeBuildSection3({
                 );
               })}
             </div>
-            <div className={s.managementFooter}>
-            </div>
+            <div className={s.managementFooter}></div>
           </div>
         </>
       )}
     </div>
   );
 }
-

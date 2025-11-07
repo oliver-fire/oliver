@@ -1,8 +1,10 @@
+import { Badge, Battery, Bot, Calendar, MapPin } from "lucide-react";
+
 import { DeviceDto } from "@/api";
+
 import FireRobotItem from "../fire-robot";
+
 import s from "./styles.module.scss";
-import { MapPin, Battery, Badge, Bot } from "lucide-react";
-import { Calendar } from "lucide-react";
 
 interface Props {
   type: "robot" | "sensor" | "all";
@@ -16,31 +18,31 @@ interface Props {
 // DeviceDto를 FireRobotItem이 기대하는 형식으로 변환
 const mapDeviceToRobotItem = (device: DeviceDto) => {
   // location 객체를 문자열로 변환
-  const locationStr = device.location 
+  const locationStr = device.location
     ? `${device.location.buildingName} ${device.location.floorName}`
     : "정보 없음";
-  
+
   // createdAt을 날짜 문자열로 변환
-  const lastUpdate = device.createdAt 
+  const lastUpdate = device.createdAt
     ? new Date(device.createdAt).toLocaleDateString("ko-KR")
     : "정보 없음";
-  
+
   // status를 한글로 변환 (필요시)
   const statusMap: Record<string, string> = {
-    "idle": "대기중",
-    "moving": "이동중",
-    "charging": "충전중",
-    "error": "고장",
-    "paused": "대기중",
-    "evolving": "진화중",
-    "offline": "오프라인",
-    "normal": "정상",
-    "warning": "점검필요",
-    "alarm": "경고",
+    idle: "대기중",
+    moving: "이동중",
+    charging: "충전중",
+    error: "고장",
+    paused: "대기중",
+    evolving: "진화중",
+    offline: "오프라인",
+    normal: "정상",
+    warning: "점검필요",
+    alarm: "경고",
   };
-  
+
   const status = statusMap[device.status] || device.status;
-  
+
   return {
     id: device.deviceId,
     name: device.name,
@@ -52,63 +54,78 @@ const mapDeviceToRobotItem = (device: DeviceDto) => {
   };
 };
 
-export default function RobotList({ 
-  type, 
-  onRobotSelect, 
-  selectedRobotId, 
+export default function RobotList({
+  type,
+  onRobotSelect,
+  selectedRobotId,
   searchQuery = "",
   robots = [],
-  sensors = []
+  sensors = [],
 }: Props) {
-  const items = type === "robot" 
-    ? robots 
-    : type === "sensor" 
-    ? sensors 
-    : [...robots, ...sensors];
+  const items =
+    type === "robot"
+      ? robots
+      : type === "sensor"
+        ? sensors
+        : [...robots, ...sensors];
 
   // 검색 필터링
-  const filteredItems = items.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-  
+
   return (
     <div className={s.robotList}>
       <div className={s.header}>
         <div className={s.headerLeft}>
-          <Bot/>
+          <Bot />
           <span>로봇</span>
         </div>
-        
+
         <div className={s.headerItem}>
-          <Badge/>
+          <Badge />
           <span>상태</span>
         </div>
         <div className={s.headerItem}>
-          <Battery/>
+          <Battery />
           <span>배터리</span>
         </div>
         <div className={s.headerItem}>
-          <MapPin/>
-          <span>{type === "robot" ? "로봇 위치" : type === "sensor" ? "센서 위치" : "위치"}</span>
+          <MapPin />
+          <span>
+            {type === "robot"
+              ? "로봇 위치"
+              : type === "sensor"
+                ? "센서 위치"
+                : "위치"}
+          </span>
         </div>
         <div className={s.headerItem}>
-          <Calendar/>
+          <Calendar />
           <span>등록 일자</span>
         </div>
       </div>
 
       <div className={s.list}>
         {filteredItems.length === 0 ? (
-          <div style={{ padding: "40px", textAlign: "center", color: "#8B8B8B" }}>
-            등록된 {type === "robot" ? "로봇" : type === "sensor" ? "센서" : "디바이스"}이 없습니다.
+          <div
+            style={{ padding: "40px", textAlign: "center", color: "#8B8B8B" }}
+          >
+            등록된{" "}
+            {type === "robot"
+              ? "로봇"
+              : type === "sensor"
+                ? "센서"
+                : "디바이스"}
+            이 없습니다.
           </div>
         ) : (
           filteredItems.map((item) => {
             const mappedItem = mapDeviceToRobotItem(item);
             return (
-              <FireRobotItem 
-                key={item.deviceId} 
-                robot={mappedItem} 
+              <FireRobotItem
+                key={item.deviceId}
+                robot={mappedItem}
                 onSelect={onRobotSelect}
                 isSelected={selectedRobotId === item.deviceId}
               />
@@ -119,4 +136,3 @@ export default function RobotList({
     </div>
   );
 }
-

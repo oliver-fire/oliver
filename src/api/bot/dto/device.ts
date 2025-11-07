@@ -63,4 +63,3 @@ export interface DeleteDeviceResponseDto {
   status: string;
   message: string;
 }
-
