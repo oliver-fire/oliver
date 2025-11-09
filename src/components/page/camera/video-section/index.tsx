@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { RealtimeVideo } from "../../../components";
-import { VideoDetail } from "../../../components/only-page";
+import { RealtimeVideo } from "@/components";
+import VideoDetail from "../video-detail";
 
 import s from "./style.module.scss";
 

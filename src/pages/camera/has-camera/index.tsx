@@ -1,5 +1,5 @@
 import { MainLayout } from "@/shared/components";
-import { CameraInfoSection, VideoSection } from "@/camera/widgets";
+import { CameraInfoSection, VideoSection } from "@/components/page/camera";
 
 export default function HasCamera() {
   return (
