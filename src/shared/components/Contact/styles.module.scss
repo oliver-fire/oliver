@@ -17,10 +17,10 @@
   display: flex;
   align-items: center;
   gap: $spacing-12;
-  
+
   padding: 0 $spacing-16;
   height: 56px;
-  
+
   background-color: $background;
   border: 1px solid $border;
   border-radius: $radius-8;
@@ -38,12 +38,17 @@
   border: none;
   outline: none;
   background: transparent;
-  
+
   font-size: 16px;
   color: $content;
-  
+
   &::placeholder {
     color: $content-weak;
   }
 }
 
+.phoneInputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

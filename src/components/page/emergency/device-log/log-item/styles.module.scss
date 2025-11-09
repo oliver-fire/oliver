@@ -1,0 +1,101 @@
+.container {
+  display: flex;
+  width: 100%;
+  padding: var(--Spacing-16, 16px) var(--Spacing-20, 20px);
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: var(--Radius-16, 16px);
+  border: 1px solid var(--Border-Base, #eaeaea);
+}
+
+.left {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--Spacing-16, 16px);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--Spacing-10, 10px);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--Spacing-4, 4px);
+}
+
+.title {
+  color: #000;
+  font-family: Pretendard;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.description {
+  color: var(--Content-Weak, #8b8b8b);
+  font-family: Pretendard;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.ns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--Content-Weak, #8b8b8b);
+  font-family: Pretendard;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+
+  .robotImage {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    object-fit: contain;
+  }
+
+  .robotName {
+    color: #000;
+    font-family: Pretendard;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    margin: 0;
+  }
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.time {
+  color: var(--Content-Base, #272727);
+  font-family: Pretendard;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  margin: 0;
+}

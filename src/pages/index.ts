@@ -1,11 +1,11 @@
-export { default as AuthCallback } from "./auth-callback";
 export { default as Camera } from "./camera/index";
-export { default as Emergency } from "./emergency";
-export { default as Login } from "./login";
+export { default as Emergency } from "./emergency/index";
+export { default as Login } from "./auth/login";
 export { default as Map } from "./map/index";
-export { default as Settings } from "./settings";
+export { default as Settings } from "./settings/index";
 export { default as Robot } from "./robot";
 export { default as Register1 } from "./robot/register/section1";
 export { default as Register2 } from "./robot/register/section2";
 export { default as MapRegisterSection1 } from "./map/register/section1";
 export { default as MapRegisterSection2 } from "./map/register/section2";
+export { default as AuthCallback } from "./auth/auth-callback";

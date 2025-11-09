@@ -1,0 +1,78 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+
+  .main_section {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--Spacing-10, 10px);
+
+      .description {
+        color: var(--Content-Weak, #8b8b8b);
+        font-family: Pretendard;
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: normal;
+      }
+
+      .title {
+        color: #000;
+        font-family: Pretendard;
+        font-size: 36px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+      }
+    }
+
+    .map_section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+}
+
+.sub_section {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  .fire_declaration_section {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+.sub_description {
+  color: #000;
+  font-family: Pretendard;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.camera_section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--Spacing-16, 16px);
+  align-self: stretch;
+}
+
+.device_log {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: fit-content;
+}

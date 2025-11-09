@@ -1,10 +1,10 @@
 import { ChevronDown, Phone } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { Button, Checkbox, Contact } from "@/shared/components";
 import MainLayout from "@/shared/components/main-layout";
 
-import s from "./settings.module.scss";
+import s from "./styles.module.scss";
 
 // 임시 소방서 목데이터
 const fireStations = [
@@ -19,36 +19,50 @@ const fireStations = [
 
 export default function Settings() {
   const [selectedFireStation, setSelectedFireStation] = useState(
-    fireStations[0],
+    fireStations[0]
   );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 외부 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   return (
     <MainLayout>
-      <div style={{ display: "flex", flexDirection: "column", gap: "48px" }}>
-        <div>
-          <span style={{ fontSize: "24px", fontWeight: "500" }}>설정</span>
-          <br />
-          <span style={{ color: "#8B8B8B" }}>올리버 설정을 할 수 있습니다</span>
+      <div className={s.container}>
+        <div className={s.content}>
+          <h1 className={s.title}>설정</h1>
+          <span className={s.description}>올리버 설정을 할 수 있습니다</span>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "24px",
-            width: "416px",
-            height: "fit-content",
-          }}
-        >
-          <span style={{ fontSize: "20px", fontWeight: "500" }}>화재 기능</span>
-          <Checkbox
-            label="자동 AI 119 신고"
-            defaultChecked={true}
-            onChange={() => {}}
-          />
+        <div className={s.fireFunction}>
+          <h2 className={s.sub_title}>화재 기능</h2>
 
-          <div className={s.fireStationSelect}>
+          <div className={s.firedeclaration}>
+            <Checkbox
+              label="자동 AI 119 신고"
+              defaultChecked={true}
+              onChange={() => {}}
+            />
+          </div>
+          <div className={s.fireStationSelect} ref={dropdownRef}>
             <div
               className={s.selectButton}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -62,7 +76,9 @@ export default function Settings() {
                 {fireStations.map((station) => (
                   <div
                     key={station}
-                    className={`${s.dropdownItem} ${selectedFireStation === station ? s.selected : ""}`}
+                    className={`${s.dropdownItem} ${
+                      station === selectedFireStation ? s.selected : ""
+                    }`}
                     onClick={() => {
                       setSelectedFireStation(station);
                       setIsDropdownOpen(false);
@@ -74,16 +90,16 @@ export default function Settings() {
               </div>
             )}
           </div>
-
+        </div>
+        <div className={s.contact}>
           <Contact
             title="전화알림"
             firstButtonText="전화를 받겠습니다"
-            secondButtonText="전화를 받지 않겠습니다"
+            secondButtonText="안 받을게요"
             icon={Phone}
             placeholder="010-0000-0000"
           />
         </div>
-
         <Button text="저장" onClick={() => {}} />
       </div>
     </MainLayout>

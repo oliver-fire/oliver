@@ -51,7 +51,9 @@ export default function HasFloors({
   mapImageUrl = "/sample/mpas/my_map.png",
 }: HasFloorsProps) {
   const navigate = useNavigate();
-  const [selectedFloorId, setSelectedFloorId] = useState<string>("1");
+  const [selectedFloorId, setSelectedFloorId] = useState<string>(
+    mockFloors[0]?.id || "1"
+  );
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
@@ -209,11 +211,17 @@ export default function HasFloors({
     };
   }, [isDraggingDevice, draggedDeviceId, zoomLevel, mapOffset, placedDevices]);
 
+  // 선택된 floor의 이름 가져오기
+  const selectedFloor = mockFloors.find(
+    (floor) => floor.id === selectedFloorId
+  );
+  const selectedFloorName = selectedFloor?.name || mockFloors[0]?.name || "1층";
+
   return (
     <MainLayout backgroundVariant="gray">
       <div className={s.container}>
         <div className={s.sub_function_header}>
-          <Filter FloorName="1층" onToggle={setIsFilterOpen} />
+          <Filter FloorName={selectedFloorName} onToggle={setIsFilterOpen} />
           <Scale
             scale={zoomLevel}
             onZoomIn={handleZoomIn}
