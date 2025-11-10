@@ -17,12 +17,23 @@ export default function SubHeader() {
   const currentPath = location.pathname;
   const currentPageName = routeNames[currentPath] || "Page";
 
+  // 로봇 등록 페이지인지 확인
+  const isRobotRegisterPage = currentPath.startsWith("/robot/register");
+
   return (
     <div className={s.subHeader}>
       <div className={s.breadcrumb}>
         <span className={s.parent}>Dashboard</span>
         <ChevronRight className={s.separator} size={18} />
-        <span className={s.current}>{currentPageName}</span>
+        {isRobotRegisterPage ? (
+          <>
+            <span className={s.parent}>Robots</span>
+            <ChevronRight className={s.separator} size={18} />
+            <span className={s.current}>Register</span>
+          </>
+        ) : (
+          <span className={s.current}>{currentPageName}</span>
+        )}
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import FireDeclaration from "@/components/page/emergency/fire-declaration";
 
 export default function Emergency() {
   return (
-    <MainLayout>
+    <MainLayout hideSubHeader>
       <div className={s.container}>
         <div className={s.main_section}>
           <div className={s.content}>
