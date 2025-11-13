@@ -16,6 +16,17 @@ import { getBuildingFloorMap } from "@/api/map/service";
 import { getBuildingFloorRobots } from "@/api/bot/service";
 import { DeviceType } from "@/api/bot/dto/device";
 
+// API baseURL 가져오기
+const getApiBaseURL = () => {
+  const isLocal =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1");
+  return isLocal
+    ? "https://oliver-api-staging.thnos.app"
+    : "https://oliver-api.thnos.app";
+};
+
 interface HasFloorsProps {
   mapImageUrl?: string;
 }
@@ -47,7 +58,8 @@ export default function HasFloors({
   const [draggedDeviceId, setDraggedDeviceId] = useState<string | null>(null);
   const [isDraggingDevice, setIsDraggingDevice] = useState(false);
   const [mapOffset, setMapOffset] = useState({ x: 0, y: 0 });
-  const [currentMapUrl, setCurrentMapUrl] = useState<string>(mapImageUrl);
+  const [currentMapUrl, setCurrentMapUrl] = useState<string>("");
+  const [isMapLoading, setIsMapLoading] = useState(false);
   const [buildingId, setBuildingId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [devices, setDevices] = useState<Device[]>([]);
@@ -92,8 +104,12 @@ export default function HasFloors({
   // 선택된 층의 맵 이미지 가져오기
   useEffect(() => {
     const fetchMap = async () => {
-      if (!selectedFloorId || !buildingId) return;
+      if (!selectedFloorId || !buildingId) {
+        setCurrentMapUrl("");
+        return;
+      }
 
+      setIsMapLoading(true);
       try {
         const mapResponse = await getBuildingFloorMap(
           buildingId,
@@ -102,14 +118,53 @@ export default function HasFloors({
         console.log("맵 API 응답:", mapResponse);
         console.log("mapPgmUrl:", mapResponse.data.mapPgmUrl);
         console.log("mapYamlUrl:", mapResponse.data.mapYamlUrl);
-        // mapPgmUrl을 맵 이미지로 사용 (PGM 파일은 이미지 형식)
-        const mapUrl = mapResponse.data.mapPgmUrl || mapImageUrl;
-        console.log("사용할 맵 URL:", mapUrl);
-        setCurrentMapUrl(mapUrl);
+
+        // mapPgmUrl이 유효한 값인지 확인
+        const mapPgmUrl = mapResponse.data?.mapPgmUrl;
+        if (mapPgmUrl && mapPgmUrl.trim() !== "") {
+          // URL이 상대 경로인 경우 baseURL과 조합
+          let finalUrl = mapPgmUrl.trim();
+          const baseURL = getApiBaseURL();
+
+          if (
+            finalUrl.startsWith("http://") ||
+            finalUrl.startsWith("https://")
+          ) {
+            // 이미 완전한 URL인 경우 그대로 사용
+            console.log("✅ API에서 받은 완전한 URL 사용:", finalUrl);
+            setCurrentMapUrl(finalUrl);
+          } else if (finalUrl.startsWith("/")) {
+            // 절대 경로인 경우 (예: "/maps/image.pgm")
+            finalUrl = `${baseURL}${finalUrl}`;
+            console.log(
+              "✅ API에서 받은 절대 경로를 baseURL과 조합:",
+              finalUrl
+            );
+            setCurrentMapUrl(finalUrl);
+          } else {
+            // 상대 경로인 경우 (예: "maps/image.pgm")
+            finalUrl = `${baseURL}/${finalUrl}`;
+            console.log(
+              "✅ API에서 받은 상대 경로를 baseURL과 조합:",
+              finalUrl
+            );
+            setCurrentMapUrl(finalUrl);
+          }
+        } else {
+          console.warn(
+            "⚠️ mapPgmUrl이 비어있거나 유효하지 않음. API 응답:",
+            mapResponse
+          );
+          console.warn("기본 이미지 사용:", mapImageUrl);
+          setCurrentMapUrl(mapImageUrl);
+        }
       } catch (error) {
-        console.error("맵 이미지 가져오기 실패:", error);
-        // 에러 발생 시 기본 이미지 사용
+        console.error("❌ 맵 이미지 가져오기 실패:", error);
+        console.warn("기본 이미지 사용:", mapImageUrl);
+        // 에러 발생 시에만 기본 이미지 사용
         setCurrentMapUrl(mapImageUrl);
+      } finally {
+        setIsMapLoading(false);
       }
     };
 
@@ -348,29 +403,45 @@ export default function HasFloors({
                 ))}
               </div>
             </div>
-            <div ref={mapAreaRef}>
-              {loading ? (
+            <div ref={mapAreaRef} className={s.mapAreaWrapper}>
+              {loading || isMapLoading ? (
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
+                    width: "100%",
                     height: "100%",
                     color: "#8B8B8B",
                   }}
                 >
                   로딩 중...
                 </div>
+              ) : currentMapUrl ? (
+                <div className={s.maparea}>
+                  <MapArea
+                    mapImageUrl={currentMapUrl}
+                    zoomLevel={zoomLevel}
+                    onZoomLevelChange={setZoomLevel}
+                    placedDevices={placedDevices}
+                    onDeviceDragStart={handlePlacedDeviceDragStart}
+                    mapOffset={mapOffset}
+                    onMapOffsetChange={setMapOffset}
+                  />
+                </div>
               ) : (
-                <MapArea
-                  mapImageUrl={currentMapUrl}
-                  zoomLevel={zoomLevel}
-                  onZoomLevelChange={setZoomLevel}
-                  placedDevices={placedDevices}
-                  onDeviceDragStart={handlePlacedDeviceDragStart}
-                  mapOffset={mapOffset}
-                  onMapOffsetChange={setMapOffset}
-                />
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                    height: "100%",
+                    color: "#8B8B8B",
+                  }}
+                >
+                  맵 이미지를 불러올 수 없습니다.
+                </div>
               )}
             </div>
           </div>
@@ -385,7 +456,9 @@ export default function HasFloors({
           <button
             className={s.button_scan}
             onClick={() => {
-              navigate(`/map/register/section2?floorId=${selectedFloorId || ""}`);
+              navigate(
+                `/map/register/section2?floorId=${selectedFloorId || ""}`
+              );
             }}
           >
             <Radar size={16} />

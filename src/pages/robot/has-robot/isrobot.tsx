@@ -1,15 +1,27 @@
+import { useState } from "react";
 import MainLayout from "@/shared/components/main-layout";
 import s from "./styles.module.scss";
 import RobotList from "@/components/page/robot/robot-list";
+import RobotDetail from "@/components/page/robot/robot-detail";
 import Button from "@/shared/components/butoon";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { DeviceDto } from "@/api/bot/dto/device";
 
 export default function HasRobot() {
   const navigate = useNavigate();
+  const [selectedRobot, setSelectedRobot] = useState<DeviceDto | null>(null);
 
   const handleAddRobot = () => {
     navigate("/robot/register/section1");
+  };
+
+  const handleRobotClick = (device: DeviceDto) => {
+    setSelectedRobot(device);
+  };
+
+  const handleCloseDetail = () => {
+    setSelectedRobot(null);
   };
 
   return (
@@ -29,7 +41,23 @@ export default function HasRobot() {
           />
         </div>
 
-        <RobotList />
+        <RobotList onRobotClick={handleRobotClick} />
+
+        {selectedRobot && (
+          <div className={s.detailOverlay} onClick={handleCloseDetail}>
+            <div className={s.detailModal} onClick={(e) => e.stopPropagation()}>
+              <RobotDetail
+                name={selectedRobot.name || "이름 없음"}
+                type={
+                  selectedRobot.type === "robot" ? "소화 로봇" : "화재 감지기"
+                }
+                onClose={handleCloseDetail}
+                batteryLevel={selectedRobot.batteryLevel}
+                createdAt={selectedRobot.createdAt}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   );

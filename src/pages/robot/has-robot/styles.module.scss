@@ -38,3 +38,73 @@
   flex-direction: row;
   margin-bottom: 24px;
 }
+
+.detailOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: var(--Spacing-32, 32px);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.detailModal {
+  position: relative;
+  background: var(--Fill-Base, #fff);
+  border-radius: var(--Radius-20, 20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  max-height: calc(100vh - 64px);
+  animation: slideIn 0.3s ease;
+  z-index: 1001;
+  overflow: hidden;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: var(--Spacing-20, 20px);
+  right: var(--Spacing-20, 20px);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--Border-Base, #eaeaea);
+  background: var(--Fill-Base, #fff);
+  color: var(--Content-Weak, #8b8b8b);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--Fill-Strong, #eff0f2);
+    color: var(--Content, #0e0e0e);
+    border-color: var(--Border-Strong, #d0d0d0);
+  }
+}

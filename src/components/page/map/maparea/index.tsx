@@ -18,6 +18,7 @@ interface MapAreaProps {
   onDeviceDragStart?: (deviceId: string, e: React.MouseEvent) => void;
   onMapOffsetChange?: (offset: { x: number; y: number }) => void;
   mapOffset?: { x: number; y: number };
+  showBorder?: boolean;
 }
 
 export default function MapArea({
@@ -28,6 +29,7 @@ export default function MapArea({
   onDeviceDragStart,
   onMapOffsetChange,
   mapOffset: externalMapOffset,
+  showBorder = true,
 }: MapAreaProps) {
   const [internalMapOffset, setInternalMapOffset] = useState({ x: 0, y: 0 });
   const [isMapDragging, setIsMapDragging] = useState(false);
@@ -92,7 +94,9 @@ export default function MapArea({
 
   return (
     <div
-      className={`${s.map} ${isMapDragging ? s.dragging : ""}`}
+      className={`${s.map} ${isMapDragging ? s.dragging : ""} ${
+        !showBorder ? s.noBorder : ""
+      }`}
       onMouseDown={handleMapMouseDown}
       onWheel={handleWheel}
     >

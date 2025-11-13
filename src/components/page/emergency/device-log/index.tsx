@@ -39,7 +39,11 @@ const getIcon = (iconType: string): React.ReactNode => {
   }
 };
 
-export default function DeviceLog() {
+interface DeviceLogProps {
+  hideTitle?: boolean;
+}
+
+export default function DeviceLog({ hideTitle = false }: DeviceLogProps) {
   const [logs, setLogs] = useState<LogData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -124,7 +128,7 @@ export default function DeviceLog() {
 
   return (
     <div className={s.container}>
-      <p className={s.main_title}>로봇 동작 기록</p>
+      {!hideTitle && <p className={s.main_title}>로봇 동작 기록</p>}
       {logs.map((log, index) => (
         <LogItem
           key={index}

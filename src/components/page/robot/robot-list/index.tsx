@@ -82,7 +82,11 @@ const mapDeviceToRobotItem = (device: DeviceDto) => {
   };
 };
 
-export default function RobotList() {
+interface RobotListProps {
+  onRobotClick?: (device: DeviceDto) => void;
+}
+
+export default function RobotList({ onRobotClick }: RobotListProps = {}) {
   const [selectedSegment, setSelectedSegment] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [devices, setDevices] = useState<DeviceDto[]>([]);
@@ -219,7 +223,13 @@ export default function RobotList() {
           ) : (
             filteredDevices.map((device) => {
               const robotItemProps = mapDeviceToRobotItem(device);
-              return <RobotItem key={device.deviceId} {...robotItemProps} />;
+              return (
+                <RobotItem
+                  key={device.deviceId}
+                  {...robotItemProps}
+                  onClick={() => onRobotClick?.(device)}
+                />
+              );
             })
           )}
         </div>
