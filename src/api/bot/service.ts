@@ -166,6 +166,32 @@ export const deleteDevice = async (
 };
 
 /**
+ * 디바이스 로그 조회
+ */
+export interface DeviceLogResponse {
+  status: number;
+  message: string;
+  responseAt: string;
+  data: {
+    logId: string;
+    timestamp: string;
+    title: string;
+    message: string;
+    level: string;
+    icon: string;
+  }[];
+}
+
+export const getDeviceLogs = async (
+  deviceId: string
+): Promise<DeviceLogResponse> => {
+  const response = await apiClient.get<DeviceLogResponse>(
+    `/v1/device/${deviceId}/logs`
+  );
+  return response.data;
+};
+
+/**
  * 로봇 등록
  * @param data - 로봇 등록에 필요한 정보 (id, buildingId, floorId, name)
  * @returns 등록된 디바이스 정보

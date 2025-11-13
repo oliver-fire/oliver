@@ -15,22 +15,15 @@ import MapArea from "../../map/maparea";
 import DeviceLog from "../../emergency/device-log";
 import { X } from "lucide-react";
 import { getBuildingFloors } from "@/api/building/service";
+import { getDeviceById } from "@/api/bot/service";
+import { DeviceType } from "@/api/bot/dto/device";
 
 interface RobotDetailProps {
-  name: string;
-  type: string;
+  deviceId: string;
   onClose?: () => void;
-  batteryLevel?: number;
-  createdAt?: string;
 }
 
-export default function RobotDetail({
-  name,
-  type,
-  onClose,
-  batteryLevel = 100,
-  createdAt,
-}: RobotDetailProps) {
+export default function RobotDetail({ deviceId, onClose }: RobotDetailProps) {
   const [zoomLevel, setZoomLevel] = useState(100);
   const [floors, setFloors] = useState<
     { id: string; name: string; level: number }[]
@@ -39,32 +32,27 @@ export default function RobotDetail({
   const [selectedFloorName, setSelectedFloorName] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [device, setDevice] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // 배터리 상태 계산
-  const getBatteryStatus = (battery: number): string => {
-    if (battery <= 20) return "낮음";
-    if (battery <= 50) return "보통";
-    return "높음";
-  };
+  // 디바이스 상세 정보 가져오기
+  useEffect(() => {
+    const fetchDeviceDetail = async () => {
+      try {
+        setLoading(true);
+        const deviceData = await getDeviceById(deviceId);
+        setDevice(deviceData);
+      } catch (error) {
+        console.error("디바이스 상세 정보 가져오기 실패:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // 등록일자 포맷팅
-  const formatDate = (dateString?: string): string => {
-    if (!dateString) return "정보 없음";
-    try {
-      const date = new Date(dateString);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      const day = date.getDate();
-      const hours = date.getHours();
-      const minutes = date.getMinutes();
-      return `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
-    } catch (error) {
-      return "정보 없음";
+    if (deviceId) {
+      fetchDeviceDetail();
     }
-  };
-
-  const batteryStatus = getBatteryStatus(batteryLevel);
-  const formattedDate = formatDate(createdAt);
+  }, [deviceId]);
 
   // 층 목록 가져오기
   useEffect(() => {
@@ -107,6 +95,76 @@ export default function RobotDetail({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDropdownOpen]);
+
+  // 배터리 상태 계산
+  const getBatteryStatus = (battery: number): string => {
+    if (battery <= 20) return "낮음";
+    if (battery <= 50) return "보통";
+    return "높음";
+  };
+
+  // 통신 상태 계산
+  const getCommunicationStatus = (status: number): string => {
+    if (status >= 80) return "좋음";
+    if (status >= 50) return "보통";
+    if (status >= 20) return "나쁨";
+    return "매우 나쁨";
+  };
+
+  // 업타임 포맷팅 (초를 일/시간/분으로 변환)
+  const formatUptime = (seconds: number): string => {
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    if (days > 0) {
+      return `${days}일`;
+    } else if (hours > 0) {
+      return `${hours}시간`;
+    } else if (minutes > 0) {
+      return `${minutes}분`;
+    }
+    return "1분 미만";
+  };
+
+  // 등록일자 포맷팅
+  const formatDate = (dateString?: string): string => {
+    if (!dateString) return "정보 없음";
+    try {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      return `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
+    } catch (error) {
+      return "정보 없음";
+    }
+  };
+
+  // 로딩 중이거나 디바이스 정보가 없을 때
+  if (loading || !device) {
+    return (
+      <div className={s.container}>
+        <div style={{ padding: "40px", textAlign: "center", color: "#8B8B8B" }}>
+          로딩 중...
+        </div>
+      </div>
+    );
+  }
+
+  const name = device.name || "이름 없음";
+  const type = device.type === DeviceType.ROBOT ? "소화 로봇" : "화재 감지기";
+  const batteryLevel = device.batteryLevel || 0;
+  const createdAt = device.createdAt;
+  const communicationStatus = device.communicationStatus || 0;
+  const uptimeSeconds = device.uptimeSeconds || 0;
+
+  const batteryStatus = getBatteryStatus(batteryLevel);
+  const formattedDate = formatDate(createdAt);
+  const communicationStatusText = getCommunicationStatus(communicationStatus);
+  const uptimeText = formatUptime(uptimeSeconds);
 
   const handleZoomIn = () => {
     setZoomLevel((prev) => Math.min(200, prev + 10));
@@ -156,7 +214,7 @@ export default function RobotDetail({
                 <Wifi size={18} className={s.info_icon} />
                 <span className={s.info_label}>통신 상태</span>
               </div>
-              <span className={s.info_value}>좋음</span>
+              <span className={s.info_value}>{communicationStatusText}</span>
             </div>
           </div>
           <div className={s.info_row}>
@@ -165,7 +223,7 @@ export default function RobotDetail({
                 <Timer size={18} className={s.info_icon} />
                 <span className={s.info_label}>업타임</span>
               </div>
-              <span className={s.info_value}>342일</span>
+              <span className={s.info_value}>{uptimeText}</span>
             </div>
             <div className={s.info_card}>
               <div className={s.info_card_header}>
@@ -251,7 +309,7 @@ export default function RobotDetail({
         <div className={s.content_log}>
           <h1 className={s.content_log_title}>최근 기록</h1>
           <div className={s.content_log_content}>
-            <DeviceLog hideTitle={true} />
+            <DeviceLog hideTitle={true} deviceId={deviceId} />
           </div>
         </div>
       </div>

@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import LogItem from "./log-item";
 import s from "./styles.module.scss";
+import { getDeviceLogs } from "@/api/bot/service";
+import { getDeviceById } from "@/api/bot/service";
 
 interface LogData {
   icon: React.ReactNode;
@@ -41,9 +43,13 @@ const getIcon = (iconType: string): React.ReactNode => {
 
 interface DeviceLogProps {
   hideTitle?: boolean;
+  deviceId?: string;
 }
 
-export default function DeviceLog({ hideTitle = false }: DeviceLogProps) {
+export default function DeviceLog({
+  hideTitle = false,
+  deviceId,
+}: DeviceLogProps) {
   const [logs, setLogs] = useState<LogData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,54 +57,39 @@ export default function DeviceLog({ hideTitle = false }: DeviceLogProps) {
     const fetchLogs = async () => {
       try {
         setLoading(true);
-        // TODO: API 호출로 교체
-        // 임시 mock 데이터
-        await new Promise((resolve) => setTimeout(resolve, 500)); // 로딩 시뮬레이션
 
-        const mockLogsData = [
-          {
-            iconType: "FireExtinguisher",
-            title: "화재 진압 시작",
-            description: "소화액 분사 시작",
-            time: "14:32",
-            robotName: "소화 로봇 1호",
-          },
-          {
-            iconType: "Activity",
-            title: "화재 감지",
-            description: "온도 상승 감지",
-            time: "14:30",
-            robotName: "화재 감지기 1호",
-          },
-          {
-            iconType: "AlertCircle",
-            title: "비상 상황 발생",
-            description: "화재 알림 전송",
-            time: "14:29",
-            robotName: "화재 감지기 2호",
-          },
-          {
-            iconType: "CheckCircle",
-            title: "화재 진압 완료",
-            description: "소화 작업 완료",
-            time: "14:25",
-            robotName: "소화 로봇 2호",
-          },
-          {
-            iconType: "Flame",
-            title: "화재 진압 진행 중",
-            description: "소화액 분사 중",
-            time: "14:20",
-            robotName: "소화 로봇 3호",
-          },
-        ];
+        // deviceId가 있으면 API 호출, 없으면 빈 배열
+        if (deviceId) {
+          const logsResponse = await getDeviceLogs(deviceId);
+          const deviceData = await getDeviceById(deviceId);
+          const deviceName = deviceData.name || "알 수 없음";
 
-        const mockLogs: LogData[] = mockLogsData.map((log) => ({
-          ...log,
-          icon: getIcon(log.iconType),
-        }));
+          // 시간 포맷팅 (HH:MM 형식)
+          const formatTime = (dateString: string): string => {
+            try {
+              const date = new Date(dateString);
+              const hours = date.getHours().toString().padStart(2, "0");
+              const minutes = date.getMinutes().toString().padStart(2, "0");
+              return `${hours}:${minutes}`;
+            } catch (error) {
+              return "알 수 없음";
+            }
+          };
 
-        setLogs(mockLogs);
+          const logsData: LogData[] = logsResponse.data.map((log) => ({
+            icon: getIcon(log.icon || "AlertCircle"),
+            title: log.title,
+            description: log.message,
+            time: formatTime(log.timestamp),
+            robotName: deviceName,
+            iconType: log.icon,
+          }));
+
+          setLogs(logsData);
+        } else {
+          // deviceId가 없으면 빈 배열
+          setLogs([]);
+        }
       } catch (error) {
         console.error("로그 데이터 가져오기 실패:", error);
         setLogs([]);
@@ -108,7 +99,7 @@ export default function DeviceLog({ hideTitle = false }: DeviceLogProps) {
     };
 
     fetchLogs();
-  }, []);
+  }, [deviceId]);
 
   if (loading) {
     return (

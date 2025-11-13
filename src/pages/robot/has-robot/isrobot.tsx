@@ -47,13 +47,8 @@ export default function HasRobot() {
           <div className={s.detailOverlay} onClick={handleCloseDetail}>
             <div className={s.detailModal} onClick={(e) => e.stopPropagation()}>
               <RobotDetail
-                name={selectedRobot.name || "이름 없음"}
-                type={
-                  selectedRobot.type === "robot" ? "소화 로봇" : "화재 감지기"
-                }
+                deviceId={selectedRobot.deviceId}
                 onClose={handleCloseDetail}
-                batteryLevel={selectedRobot.batteryLevel}
-                createdAt={selectedRobot.createdAt}
               />
             </div>
           </div>
