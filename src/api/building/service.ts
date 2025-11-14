@@ -28,12 +28,14 @@ export interface FloorListResponse {
     id: string;
     level: number;
     name: string;
+    address?: string;
   }[];
 }
 
 export interface CreateFloorRequest {
   level: number;
   name: string;
+  address: string;
 }
 
 export interface CreateFloorResponse {
@@ -71,6 +73,59 @@ export const createBuildingFloor = async (
   const response = await apiClient.post<CreateFloorResponse>(
     `/v1/building/${buildingId}/floor`,
     data
+  );
+  return response.data;
+};
+
+export interface UpdateFloorRequest {
+  name: string;
+  address: string;
+}
+
+export interface UpdateFloorResponse {
+  status: number;
+  message: string;
+  responseAt: string;
+  data: {
+    id: string;
+    level: number;
+    name: string;
+    address?: string;
+  };
+}
+
+export interface DeleteFloorResponse {
+  status: number;
+  message: string;
+  responseAt: string;
+}
+
+/**
+ * 층 수정 (PUT /v1/building/{id}/floor/{floorId})
+ */
+export const updateBuildingFloor = async (
+  floorId: string,
+  data: UpdateFloorRequest
+): Promise<UpdateFloorResponse> => {
+  const buildingsResponse = await getAllBuildings();
+  const buildingId = buildingsResponse.data[0].id;
+  const response = await apiClient.put<UpdateFloorResponse>(
+    `/v1/building/${buildingId}/floor/${floorId}`,
+    data
+  );
+  return response.data;
+};
+
+/**
+ * 층 삭제 (DELETE /v1/building/{id}/floor/{floorId})
+ */
+export const deleteBuildingFloor = async (
+  floorId: string
+): Promise<DeleteFloorResponse> => {
+  const buildingsResponse = await getAllBuildings();
+  const buildingId = buildingsResponse.data[0].id;
+  const response = await apiClient.delete<DeleteFloorResponse>(
+    `/v1/building/${buildingId}/floor/${floorId}`
   );
   return response.data;
 };

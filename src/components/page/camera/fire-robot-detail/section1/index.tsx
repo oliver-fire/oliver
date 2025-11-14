@@ -48,15 +48,6 @@ function CameraSection() {
 
   return (
     <div className={s.cameraSection}>
-      <Segment
-        items={[
-          { label: "열화상 카메라", value: "thermal" },
-          { label: "일반 카메라", value: "normal" },
-        ]}
-        selected={selectedCamera}
-        onChange={setSelectedCamera}
-      />
-
       <div className={s.cameraEmpty}>
         <p className={s.emptyMessage}>카메라 정보가 없습니다</p>
         <p className={s.emptyDescription}>

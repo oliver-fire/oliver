@@ -5,11 +5,7 @@ import MainLayout from "@/shared/components/main-layout";
 import s from "./styles.module.scss";
 import BluetoothRobot from "@/components/page/robot/bluetooth-robot";
 import { ArrowRight } from "lucide-react";
-import {
-  registerRobot,
-  registerSensor,
-  generateUUID,
-} from "@/api/bot/service";
+import { registerRobot, registerSensor, generateUUID } from "@/api/bot/service";
 import { getAllBuildings } from "@/api/building/service";
 
 type Step = "searching" | "found" | "registering" | "registered";
@@ -76,13 +72,18 @@ const RegisterRobot = ({
           });
         } else {
           // 센서 등록
-          await registerSensor({
+          const sensorData = {
             id: deviceId,
             buildingId: buildingId,
             floorId: floorId,
-            name: deviceName,
             tuyaDeviceRegisterKey: "tuya-key-12345",
-          });
+            name: deviceName,
+          };
+          console.log(
+            "센서 등록 요청 데이터:",
+            JSON.stringify(sensorData, null, 2)
+          );
+          await registerSensor(sensorData);
         }
 
         // 등록 성공 후 5초 뒤 다음 단계로

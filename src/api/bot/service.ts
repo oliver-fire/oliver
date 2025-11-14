@@ -101,6 +101,38 @@ interface BuildingFloorRobotResponse {
   };
 }
 
+// Dashboard Floor Devices 응답 타입
+interface DashboardFloorDeviceResponse {
+  robotId: number;
+  name: string;
+  type: "robot" | "sensor";
+  status: string;
+  location: {
+    x: number;
+    y: number;
+  };
+}
+
+export interface DashboardFloorDevicesResponse {
+  status: number;
+  message: string;
+  responseAt: string;
+  data: DashboardFloorDeviceResponse[];
+}
+
+/**
+ * 특정 건물의 특정 층에 있는 디바이스 조회 (x, y 좌표 포함)
+ */
+export const getDashboardFloorDevices = async (
+  buildingId: string,
+  floorId: string
+): Promise<DashboardFloorDevicesResponse> => {
+  const response = await apiClient.get<DashboardFloorDevicesResponse>(
+    `/v1/dashboard/${buildingId}/${floorId}/devices`
+  );
+  return response.data;
+};
+
 /**
  * 특정 건물의 특정 층에 있는 로봇 조회
  */
@@ -399,8 +431,8 @@ export const registerSensorsSequentially = async (): Promise<DeviceDto[]> => {
         id: device.id,
         buildingId: buildingId,
         floorId: "", // 공백 문자열
-        name: "Sensor",
         tuyaDeviceRegisterKey: "tuya-key-12345", // 고정 키 값
+        name: "Sensor",
       };
 
       const registeredSensor = await registerSensor(registerData);

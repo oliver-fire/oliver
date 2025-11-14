@@ -47,6 +47,14 @@ export default function RobotDetail({
   );
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // 화재감지기일 때 name에서 tuya 키 부분 제거하는 헬퍼 함수
+  const getDisplayName = (rawName: string, deviceType: DeviceType): string => {
+    const isSensor = deviceType === DeviceType.SENSOR;
+    return isSensor && rawName.includes("-tuya-key-")
+      ? rawName.split("-tuya-key-")[0]
+      : rawName;
+  };
+
   // 디바이스 상세 정보 가져오기
   useEffect(() => {
     const fetchDeviceDetail = async () => {
@@ -54,7 +62,11 @@ export default function RobotDetail({
         setLoading(true);
         const deviceData = await getDeviceById(deviceId);
         setDevice(deviceData);
-        setEditedName(deviceData.name || "");
+        const displayName = getDisplayName(
+          deviceData.name || "",
+          deviceData.type
+        );
+        setEditedName(displayName);
       } catch (error) {
         console.error("디바이스 상세 정보 가져오기 실패:", error);
       } finally {
@@ -167,7 +179,9 @@ export default function RobotDetail({
     );
   }
 
-  const name = device.name || "이름 없음";
+  // 화재감지기일 때는 name에서 tuya 키 부분 제거
+  const name = getDisplayName(device.name || "이름 없음", device.type);
+  const isSensor = device.type === DeviceType.SENSOR;
   const type = device.type === DeviceType.ROBOT ? "소화 로봇" : "화재 감지기";
   const batteryLevel = device.batteryLevel || 0;
   const createdAt = device.createdAt;
@@ -195,12 +209,18 @@ export default function RobotDetail({
 
   const handleEditNameClick = () => {
     setIsEditingName(true);
-    setEditedName(device?.name || "");
+    if (device) {
+      const displayName = getDisplayName(device.name || "", device.type);
+      setEditedName(displayName);
+    }
   };
 
   const handleCancelEdit = () => {
     setIsEditingName(false);
-    setEditedName(device?.name || "");
+    if (device) {
+      const displayName = getDisplayName(device.name || "", device.type);
+      setEditedName(displayName);
+    }
   };
 
   const handleSaveName = async () => {
@@ -350,32 +370,21 @@ export default function RobotDetail({
             </div>
           </div>
         </div>
-        <div className={s.content_camera}>
-          <h1 className={s.content_camera_title}>로봇 카메라</h1>
-          <div className={s.content_camera_content}>
-            <Segment
-              items={[
-                { label: "열화상 카메라", value: "thermal" },
-                { label: "일반 카메라", value: "normal" },
-              ]}
-              selected={selectedCamera}
-              onChange={(value) =>
-                setSelectedCamera(value as "thermal" | "normal")
-              }
-              width={552}
-              height={44}
-            />
-
-            <div className={s.content_camera_empty}>
-              <p className={s.empty_message}>카메라 정보가 없습니다</p>
-              <p className={s.empty_description}>
-                현재 화재 감지 센서가 정상 상태이며, 영상 스트림은 비활성화되어
-                있습니다. 화재 상황이 발생하면 실시간 영상이 자동으로
-                표시됩니다.
-              </p>
+        {!isSensor && (
+          <div className={s.content_camera}>
+            <h1 className={s.content_camera_title}>로봇 카메라</h1>
+            <div className={s.content_camera_content}>
+              <div className={s.content_camera_empty}>
+                <p className={s.empty_message}>카메라 정보가 없습니다</p>
+                <p className={s.empty_description}>
+                  현재 화재 감지 센서가 정상 상태이며, 영상 스트림은
+                  비활성화되어 있습니다. 화재 상황이 발생하면 실시간 영상이
+                  자동으로 표시됩니다.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
         <div className={s.content_map}>
           <h1 className={s.content_map_title}>위치</h1>
           <div className={s.content_map_content}>

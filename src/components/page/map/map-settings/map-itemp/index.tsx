@@ -4,9 +4,16 @@ import s from "./styles.module.scss";
 interface MapItemProps {
   title: string;
   description: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-export default function MapItem({ title, description }: MapItemProps) {
+export default function MapItem({
+  title,
+  description,
+  onEdit,
+  onDelete,
+}: MapItemProps) {
   return (
     <div className={s.container}>
       <div className={s.lead}>
@@ -19,8 +26,22 @@ export default function MapItem({ title, description }: MapItemProps) {
       </div>
 
       <div className={s.tail}>
-        <Pencil size={24} color="#8B8B8B" />
-        <Trash2 size={24} color="#8B8B8B" />
+        <button
+          className={s.iconButton}
+          onClick={onEdit}
+          type="button"
+          aria-label="수정"
+        >
+          <Pencil size={24} color="#8B8B8B" />
+        </button>
+        <button
+          className={s.iconButton}
+          onClick={onDelete}
+          type="button"
+          aria-label="삭제"
+        >
+          <Trash2 size={24} color="#8B8B8B" />
+        </button>
       </div>
     </div>
   );

@@ -12,10 +12,255 @@ import FillterItem, {
 import MapArea from "@/components/page/map/maparea";
 import DeviceItem from "@/components/page/map/device";
 import MapSettings from "@/components/page/map/map-settings";
+import RobotDetail from "@/components/page/robot/robot-detail";
 import { getBuildingFloors, getAllBuildings } from "@/api/building/service";
 import { getBuildingFloorMap } from "@/api/map/service";
-import { getBuildingFloorRobots } from "@/api/bot/service";
-import { DeviceType } from "@/api/bot/dto/device";
+import {
+  getBuildingFloorRobots,
+  getAllDevices,
+  getDeviceById,
+  updateDevice,
+  getDashboardFloorDevices,
+} from "@/api/bot/service";
+import { DeviceType, DeviceDto } from "@/api/bot/dto/device";
+
+// 화재감지기일 때 name에서 tuya 키 부분 제거하는 헬퍼 함수
+const getDisplayName = (rawName: string, deviceType: DeviceType): string => {
+  const isSensor = deviceType === DeviceType.SENSOR;
+  return isSensor && rawName.includes("-tuya-key-")
+    ? rawName.split("-tuya-key-")[0]
+    : rawName;
+};
+
+// PGM 파일을 PNG로 변환하는 함수
+const convertPgmToPng = async (pgmUrl: string): Promise<string> => {
+  try {
+    console.log("🔄 [hasmap] PGM 파일 다운로드 시작:", pgmUrl);
+
+    // PGM 파일 가져오기
+    const response = await fetch(pgmUrl);
+    if (!response.ok) {
+      throw new Error(`PGM 파일 다운로드 실패: ${response.statusText}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+
+    console.log("✅ [hasmap] PGM 파일 다운로드 완료, 크기:", uint8Array.length);
+
+    // PGM 헤더 파싱
+    let offset = 0;
+    let header = "";
+
+    // P2 (ASCII) 또는 P5 (Binary) 확인
+    while (offset < uint8Array.length && header.length < 10) {
+      const char = String.fromCharCode(uint8Array[offset]);
+      header += char;
+      offset++;
+      if (char === "\n" && header.length > 2) break;
+    }
+
+    // 헤더에서 매직 넘버 확인
+    const magicNumber = header.trim().split(/\s+/)[0];
+    const isAscii = magicNumber === "P2";
+    const isBinary = magicNumber === "P5";
+
+    if (!isAscii && !isBinary) {
+      throw new Error(`지원하지 않는 PGM 형식: ${magicNumber}`);
+    }
+
+    console.log(
+      "📊 [hasmap] PGM 형식:",
+      isAscii ? "ASCII (P2)" : "Binary (P5)"
+    );
+
+    // 헤더 파싱 (너비, 높이, 최대값)
+    let width = 0;
+    let height = 0;
+    let maxValue = 255;
+
+    if (isAscii) {
+      // ASCII PGM 파싱
+      const text = new TextDecoder().decode(uint8Array);
+      const lines = text.split("\n");
+      let lineIndex = 0;
+
+      // 매직 넘버 건너뛰기
+      while (
+        lineIndex < lines.length &&
+        (lines[lineIndex].trim().startsWith("#") ||
+          lines[lineIndex].trim().startsWith("P"))
+      ) {
+        lineIndex++;
+      }
+
+      // 너비, 높이, 최대값 파싱
+      const values: number[] = [];
+      for (let i = lineIndex; i < lines.length && values.length < 3; i++) {
+        const parts = lines[i].trim().split(/\s+/);
+        for (const part of parts) {
+          if (part && !part.startsWith("#")) {
+            const num = parseInt(part, 10);
+            if (!isNaN(num)) {
+              values.push(num);
+            }
+          }
+        }
+      }
+
+      width = values[0] || 0;
+      height = values[1] || 0;
+      maxValue = values[2] || 255;
+
+      // ASCII 데이터 시작 위치 찾기
+      let dataStart = 0;
+      let valueCount = 0;
+      for (let i = 0; i < text.length; i++) {
+        if (text[i] === "\n" || text[i] === " ") {
+          const num = parseInt(text.substring(dataStart, i).trim(), 10);
+          if (!isNaN(num)) {
+            valueCount++;
+            if (valueCount === 3) {
+              offset = i + 1;
+              break;
+            }
+          }
+          dataStart = i + 1;
+        }
+      }
+    } else {
+      // Binary PGM 파싱
+      let headerEnd = 0;
+      let newlineCount = 0;
+
+      // 헤더는 보통 3-4줄 (P5, width, height, maxValue)
+      for (let i = 0; i < Math.min(1000, uint8Array.length); i++) {
+        if (uint8Array[i] === 0x0a) {
+          // \n
+          newlineCount++;
+          if (newlineCount >= 3) {
+            headerEnd = i + 1;
+            break;
+          }
+        }
+      }
+
+      // 헤더 텍스트 파싱
+      const headerText = new TextDecoder().decode(
+        uint8Array.slice(0, headerEnd)
+      );
+      const lines = headerText.split("\n");
+      const values: number[] = [];
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed && !trimmed.startsWith("#") && !trimmed.startsWith("P")) {
+          const parts = trimmed.split(/\s+/);
+          for (const part of parts) {
+            const num = parseInt(part, 10);
+            if (!isNaN(num)) {
+              values.push(num);
+            }
+          }
+        }
+      }
+
+      width = values[0] || 0;
+      height = values[1] || 0;
+      maxValue = values[2] || 255;
+
+      offset = headerEnd;
+    }
+
+    console.log(
+      "📊 [hasmap] PGM 크기:",
+      width,
+      "x",
+      height,
+      ", 최대값:",
+      maxValue
+    );
+
+    if (width === 0 || height === 0) {
+      throw new Error("PGM 크기를 파싱할 수 없습니다");
+    }
+
+    // Canvas 생성
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      throw new Error("Canvas 컨텍스트를 가져올 수 없습니다");
+    }
+
+    // ImageData 생성
+    const imageData = ctx.createImageData(width, height);
+    const data = imageData.data;
+
+    // PGM 데이터를 ImageData로 변환
+    if (isAscii) {
+      // ASCII PGM
+      const text = new TextDecoder().decode(uint8Array);
+      const textData = text.substring(offset).trim().split(/\s+/);
+      for (let i = 0; i < textData.length && i < width * height; i++) {
+        const gray = parseInt(textData[i], 10);
+        const normalized = Math.floor((gray / maxValue) * 255);
+        const index = i * 4;
+        data[index] = normalized; // R
+        data[index + 1] = normalized; // G
+        data[index + 2] = normalized; // B
+        data[index + 3] = 255; // A
+      }
+    } else {
+      // Binary PGM
+      const pixelCount = width * height;
+      const bytesPerPixel = maxValue > 255 ? 2 : 1;
+
+      for (
+        let i = 0;
+        i < pixelCount && offset + i * bytesPerPixel < uint8Array.length;
+        i++
+      ) {
+        let gray = 0;
+        if (bytesPerPixel === 1) {
+          gray = uint8Array[offset + i];
+        } else {
+          gray =
+            (uint8Array[offset + i * 2] << 8) | uint8Array[offset + i * 2 + 1];
+        }
+
+        const normalized = Math.floor((gray / maxValue) * 255);
+        const index = i * 4;
+        data[index] = normalized; // R
+        data[index + 1] = normalized; // G
+        data[index + 2] = normalized; // B
+        data[index + 3] = 255; // A
+      }
+    }
+
+    // Canvas에 그리기
+    ctx.putImageData(imageData, 0, 0);
+
+    // PNG로 변환
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error("PNG 변환 실패"));
+          return;
+        }
+
+        const pngUrl = URL.createObjectURL(blob);
+        console.log("✅ [hasmap] PGM → PNG 변환 완료:", pngUrl);
+        resolve(pngUrl);
+      }, "image/png");
+    });
+  } catch (error) {
+    console.error("❌ [hasmap] PGM 변환 실패:", error);
+    throw error;
+  }
+};
 
 // API baseURL 가져오기
 const getApiBaseURL = () => {
@@ -39,7 +284,8 @@ interface Device {
 }
 
 interface PlacedDevice {
-  id: string;
+  id: string; // 표시용 ID (robotId)
+  deviceId: string; // 실제 API 요청에 사용할 deviceId
   name: string;
   type: "robot" | "sensor";
   x: number;
@@ -58,6 +304,17 @@ export default function HasFloors({
   const [placedDevices, setPlacedDevices] = useState<PlacedDevice[]>([]);
   const [draggedDeviceId, setDraggedDeviceId] = useState<string | null>(null);
   const [isDraggingDevice, setIsDraggingDevice] = useState(false);
+
+  // placedDevices 상태 변경 시 로그 출력
+  useEffect(() => {
+    console.log("🔄 [hasmap] placedDevices 상태 변경:");
+    console.log(`  총 ${placedDevices.length}개 디바이스`);
+    placedDevices.forEach((device, index) => {
+      console.log(
+        `  [${index + 1}] ID: ${device.id}, 이름: ${device.name}, 타입: ${device.type}, 위치: (x=${device.x}, y=${device.y})`
+      );
+    });
+  }, [placedDevices]);
   const [mapOffset, setMapOffset] = useState({ x: 0, y: 0 });
   const [currentMapUrl, setCurrentMapUrl] = useState<string>("");
   const [isMapLoading, setIsMapLoading] = useState(false);
@@ -65,7 +322,12 @@ export default function HasFloors({
   const [loading, setLoading] = useState(true);
   const [devices, setDevices] = useState<Device[]>([]);
   const [devicesLoading, setDevicesLoading] = useState(false);
+  const [allDevicesFromAPI, setAllDevicesFromAPI] = useState<DeviceDto[]>([]);
   const [isMapSettingsOpen, setIsMapSettingsOpen] = useState(false);
+  const [selectedFloorName, setSelectedFloorName] = useState<string>("");
+  const [selectedDevice, setSelectedDevice] = useState<DeviceDto | null>(null);
+  const [isDeviceDetailOpen, setIsDeviceDetailOpen] = useState(false);
+  const previousBlobUrlRef = useRef<string | null>(null);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const mapAreaRef = useRef<HTMLDivElement | null>(null);
 
@@ -92,6 +354,7 @@ export default function HasFloors({
         // 첫 번째 층 선택
         if (floorsData.length > 0 && !selectedFloorId) {
           setSelectedFloorId(floorsData[0].id);
+          setSelectedFloorName(floorsData[0].name);
         }
       } catch (error) {
         console.error("층 목록 가져오기 실패:", error);
@@ -134,7 +397,6 @@ export default function HasFloors({
           ) {
             // 이미 완전한 URL인 경우 그대로 사용
             console.log("✅ API에서 받은 완전한 URL 사용:", finalUrl);
-            setCurrentMapUrl(finalUrl);
           } else if (finalUrl.startsWith("/")) {
             // 절대 경로인 경우 (예: "/maps/image.pgm")
             finalUrl = `${baseURL}${finalUrl}`;
@@ -142,7 +404,6 @@ export default function HasFloors({
               "✅ API에서 받은 절대 경로를 baseURL과 조합:",
               finalUrl
             );
-            setCurrentMapUrl(finalUrl);
           } else {
             // 상대 경로인 경우 (예: "maps/image.pgm")
             finalUrl = `${baseURL}/${finalUrl}`;
@@ -150,6 +411,32 @@ export default function HasFloors({
               "✅ API에서 받은 상대 경로를 baseURL과 조합:",
               finalUrl
             );
+          }
+
+          // PGM 파일인지 확인하고 PNG로 변환
+          if (finalUrl.toLowerCase().endsWith(".pgm")) {
+            console.log("🔄 [hasmap] PGM 파일 감지, PNG로 변환 시작");
+            try {
+              // 이전 blob URL 정리
+              if (previousBlobUrlRef.current) {
+                URL.revokeObjectURL(previousBlobUrlRef.current);
+              }
+
+              const pngUrl = await convertPgmToPng(finalUrl);
+              previousBlobUrlRef.current = pngUrl;
+              setCurrentMapUrl(pngUrl);
+            } catch (error) {
+              console.error("❌ [hasmap] PGM 변환 실패, 원본 URL 사용:", error);
+              // PGM 변환 실패 시 원본 URL 사용 (브라우저가 지원하지 않을 수 있음)
+              setCurrentMapUrl(finalUrl);
+            }
+          } else {
+            // PGM이 아니면 그대로 사용
+            // 이전 blob URL 정리
+            if (previousBlobUrlRef.current) {
+              URL.revokeObjectURL(previousBlobUrlRef.current);
+              previousBlobUrlRef.current = null;
+            }
             setCurrentMapUrl(finalUrl);
           }
         } else {
@@ -171,40 +458,283 @@ export default function HasFloors({
     };
 
     fetchMap();
+
+    // 컴포넌트 언마운트 시 blob URL 정리
+    return () => {
+      if (previousBlobUrlRef.current) {
+        URL.revokeObjectURL(previousBlobUrlRef.current);
+        previousBlobUrlRef.current = null;
+      }
+    };
   }, [selectedFloorId, buildingId, mapImageUrl]);
 
-  // 선택된 층의 로봇 목록 가져오기
+  // 선택된 층의 기기 목록 가져오기 (로봇 + 센서)
   useEffect(() => {
-    const fetchRobots = async () => {
+    const fetchDevices = async () => {
       if (!selectedFloorId || !buildingId) {
         setDevices([]);
         return;
       }
 
+      // 선택된 층의 이름 가져오기
+      const currentFloor = floors.find((f) => f.id === selectedFloorId);
+      const currentFloorName = currentFloor?.name || "";
+
       try {
         setDevicesLoading(true);
-        const robots = await getBuildingFloorRobots(
-          buildingId,
-          selectedFloorId
+
+        console.log("🔍 [hasmap] 기기 불러오기 시작");
+        console.log("📍 [hasmap] buildingId:", buildingId);
+        console.log("📍 [hasmap] floorId:", selectedFloorId);
+        console.log("📍 [hasmap] floorName:", currentFloorName);
+
+        let allDevices: Device[] = [];
+        const placedDevicesFromAPI: PlacedDevice[] = [];
+
+        // 먼저 getAllDevices를 호출해서 deviceId 매핑 정보 가져오기
+        let devicesFromAPIForMapping: DeviceDto[] = [];
+        try {
+          devicesFromAPIForMapping = await getAllDevices();
+          setAllDevicesFromAPI(devicesFromAPIForMapping); // 상태에 저장
+          console.log(
+            "✅ [hasmap] getAllDevices로 전체 디바이스 가져옴:",
+            devicesFromAPIForMapping.length
+          );
+        } catch (allDevicesError) {
+          console.error(
+            "❌ [hasmap] getAllDevices 호출 실패:",
+            allDevicesError
+          );
+        }
+
+        // 이름과 타입으로 deviceId를 찾는 헬퍼 함수 (로컬 변수 사용)
+        const findDeviceIdLocal = (
+          name: string,
+          type: "robot" | "sensor"
+        ): string => {
+          const deviceType =
+            type === "robot" ? DeviceType.ROBOT : DeviceType.SENSOR;
+          const found = devicesFromAPIForMapping.find(
+            (d: DeviceDto) => d.name === name && d.type === deviceType
+          );
+          if (found) {
+            console.log(
+              `  🔍 [hasmap] deviceId 찾음: 이름="${name}", 타입="${type}" -> deviceId="${found.deviceId}"`
+            );
+            return found.deviceId;
+          }
+          console.warn(
+            `  ⚠️ [hasmap] deviceId를 찾을 수 없음: 이름="${name}", 타입="${type}"`
+          );
+          return ""; // deviceId를 찾을 수 없으면 빈 문자열 반환
+        };
+
+        // 방법 1: /v1/dashboard/{buildingId}/{floorId}/devices API 사용 (x, y 좌표 포함)
+        try {
+          const dashboardResponse = await getDashboardFloorDevices(
+            buildingId,
+            selectedFloorId
+          );
+          console.log(
+            "✅ [hasmap] getDashboardFloorDevices 응답:",
+            dashboardResponse
+          );
+          console.log(
+            `📊 [hasmap] 대시보드 API에서 가져온 기기 수: ${dashboardResponse.data.length}`
+          );
+
+          dashboardResponse.data.forEach((device, index) => {
+            const x = device.location?.x ?? 0;
+            const y = device.location?.y ?? 0;
+
+            console.log(
+              `  [${index + 1}] robotId: ${device.robotId}, 이름: ${device.name}, 타입: ${device.type}`
+            );
+            console.log(
+              `      📍 위치 정보: x=${x}, y=${y}, location 객체:`,
+              device.location
+            );
+            console.log(
+              `      ✅ x가 0이 아님: ${x !== 0}, y가 0이 아님: ${y !== 0}`
+            );
+
+            // 실제 deviceId 찾기
+            const actualDeviceId = findDeviceIdLocal(device.name, device.type);
+            console.log(
+              `      🔑 실제 deviceId: ${actualDeviceId || "(찾을 수 없음)"}`
+            );
+
+            // Device 목록에 추가
+            allDevices.push({
+              id: device.robotId.toString(),
+              name: getDisplayName(
+                device.name,
+                device.type === "robot" ? DeviceType.ROBOT : DeviceType.SENSOR
+              ),
+              type: device.type,
+            });
+
+            // x, y 좌표가 있으면 placedDevices에 추가
+            if (
+              device.location &&
+              device.location.x !== undefined &&
+              device.location.y !== undefined
+            ) {
+              console.log(
+                `      ✅ placedDevices에 추가: robotId=${device.robotId}, deviceId=${actualDeviceId}, x=${device.location.x}, y=${device.location.y}`
+              );
+              placedDevicesFromAPI.push({
+                id: device.robotId.toString(),
+                deviceId: actualDeviceId || device.robotId.toString(), // deviceId를 찾을 수 없으면 robotId 사용
+                name: getDisplayName(
+                  device.name,
+                  device.type === "robot" ? DeviceType.ROBOT : DeviceType.SENSOR
+                ),
+                type: device.type,
+                x: device.location.x,
+                y: device.location.y,
+              });
+            } else {
+              console.log(
+                `      ⚠️ 위치 정보 없음 - placedDevices에 추가하지 않음`
+              );
+            }
+          });
+
+          console.log(
+            `📊 [hasmap] 지도에 배치할 디바이스 수: ${placedDevicesFromAPI.length}`
+          );
+          placedDevicesFromAPI.forEach((device, index) => {
+            console.log(
+              `  [${index + 1}] robotId: ${device.id}, deviceId: ${device.deviceId}, 이름: ${device.name}, 타입: ${device.type}, 위치: (x=${device.x}, y=${device.y})`
+            );
+          });
+
+          // placedDevices 업데이트 (x, y 좌표가 있는 디바이스들)
+          if (placedDevicesFromAPI.length > 0) {
+            console.log(
+              `✅ [hasmap] placedDevices 상태 업데이트: ${placedDevicesFromAPI.length}개 디바이스`
+            );
+            setPlacedDevices(placedDevicesFromAPI);
+          } else {
+            console.log(
+              `⚠️ [hasmap] 배치할 디바이스가 없습니다. 모든 디바이스의 x, y 좌표가 0이거나 없습니다.`
+            );
+          }
+        } catch (dashboardError) {
+          console.error("❌ [hasmap] 대시보드 API 호출 실패:", dashboardError);
+
+          // 대시보드 API 실패 시 기존 방식으로 폴백
+          try {
+            const robots = await getBuildingFloorRobots(
+              buildingId,
+              selectedFloorId
+            );
+            console.log("✅ [hasmap] getBuildingFloorRobots 응답:", robots);
+            console.log(
+              `📊 [hasmap] 로봇 API에서 가져온 기기 수: ${robots.length}`
+            );
+
+            robots.forEach((device, index) => {
+              console.log(
+                `  [${index + 1}] ID: ${device.deviceId}, 이름: ${device.name}, 타입: ${device.type === DeviceType.ROBOT ? "로봇" : "센서"}`
+              );
+            });
+
+            // DeviceDto를 Device 형태로 변환 (화재감지기 이름 처리)
+            allDevices = robots.map((robot) => ({
+              id: robot.deviceId,
+              name: getDisplayName(robot.name, robot.type),
+              type: robot.type === DeviceType.ROBOT ? "robot" : "sensor",
+            }));
+
+            // x, y 좌표가 있으면 placedDevices에 추가
+            const placedFromRobots: PlacedDevice[] = robots
+              .filter(
+                (robot) =>
+                  robot.location &&
+                  robot.location.x !== undefined &&
+                  robot.location.y !== undefined
+              )
+              .map((robot) => ({
+                id: robot.deviceId, // 표시용 ID
+                deviceId: robot.deviceId, // 실제 API 요청에 사용할 deviceId
+                name: getDisplayName(robot.name, robot.type),
+                type: (robot.type === DeviceType.ROBOT ? "robot" : "sensor") as
+                  | "robot"
+                  | "sensor",
+                x: robot.location!.x,
+                y: robot.location!.y,
+              }));
+
+            if (placedFromRobots.length > 0) {
+              setPlacedDevices(placedFromRobots);
+            }
+          } catch (robotError) {
+            console.error("❌ [hasmap] 로봇 API 호출 실패:", robotError);
+          }
+        }
+
+        // 방법 2: getAllDevices로 모든 디바이스를 가져와서 해당 층 필터링 (센서 포함, 대시보드 API가 실패한 경우만)
+        if (allDevices.length === 0) {
+          try {
+            const allDevicesFromAPI = await getAllDevices();
+            console.log("✅ [hasmap] getAllDevices 응답:", allDevicesFromAPI);
+            console.log(
+              `📊 [hasmap] 전체 디바이스 수: ${allDevicesFromAPI.length}`
+            );
+
+            // 해당 층의 디바이스만 필터링
+            const floorDevices = allDevicesFromAPI.filter(
+              (device) =>
+                device.location?.floorId === selectedFloorId ||
+                device.location?.floorName === currentFloorName ||
+                (device.location?.buildingId === buildingId &&
+                  currentFloorName &&
+                  device.location?.floorName === currentFloorName)
+            );
+
+            console.log(
+              `📊 [hasmap] 해당 층(${selectedFloorId}, ${currentFloorName})의 디바이스 수: ${floorDevices.length}`
+            );
+
+            // getAllDevices 결과를 사용 (센서 포함, 화재감지기 이름 처리)
+            if (floorDevices.length > 0) {
+              allDevices = floorDevices.map((device) => ({
+                id: device.deviceId,
+                name: getDisplayName(device.name, device.type),
+                type: device.type === DeviceType.ROBOT ? "robot" : "sensor",
+              }));
+            }
+          } catch (allDevicesError) {
+            console.error(
+              "❌ [hasmap] getAllDevices 호출 실패:",
+              allDevicesError
+            );
+          }
+        }
+
+        console.log("✅ [hasmap] 최종 기기 목록:", allDevices);
+        console.log(`📊 [hasmap] 최종 기기 수: ${allDevices.length}`);
+        const robotCount = allDevices.filter((d) => d.type === "robot").length;
+        const sensorCount = allDevices.filter(
+          (d) => d.type === "sensor"
+        ).length;
+        console.log(
+          `📊 [hasmap] 로봇: ${robotCount}개, 센서: ${sensorCount}개`
         );
-        // DeviceDto를 Device 형태로 변환
-        const devicesData: Device[] = robots.map((robot) => ({
-          id: robot.deviceId,
-          name: robot.name,
-          type: robot.type === DeviceType.ROBOT ? "robot" : "sensor",
-        }));
-        setDevices(devicesData);
-        console.log("해당 층의 로봇 목록:", devicesData);
+
+        setDevices(allDevices);
       } catch (error) {
-        console.error("로봇 목록 가져오기 실패:", error);
+        console.error("❌ [hasmap] 기기 목록 가져오기 실패:", error);
         setDevices([]);
       } finally {
         setDevicesLoading(false);
       }
     };
 
-    fetchRobots();
-  }, [selectedFloorId, buildingId]);
+    fetchDevices();
+  }, [selectedFloorId, buildingId, floors, selectedFloorName]);
 
   const handleZoomIn = () => {
     const newZoom = Math.min(200, zoomLevel + 10);
@@ -239,6 +769,30 @@ export default function HasFloors({
     };
   };
 
+  // 디바이스 클릭 핸들러
+  const handleDeviceClick = async (deviceId: string) => {
+    try {
+      const deviceData = await getDeviceById(deviceId);
+      setSelectedDevice(deviceData);
+      setIsDeviceDetailOpen(true);
+    } catch (error) {
+      console.error("디바이스 정보 가져오기 실패:", error);
+    }
+  };
+
+  // 디바이스 디테일 닫기
+  const handleCloseDeviceDetail = () => {
+    setIsDeviceDetailOpen(false);
+    setSelectedDevice(null);
+  };
+
+  // 디바이스 업데이트 후 새로고침
+  const handleDeviceUpdate = () => {
+    // 디바이스 목록 새로고침을 위해 selectedFloorId나 buildingId 변경 트리거
+    // useEffect가 자동으로 다시 실행됨
+    setDevices([...devices]);
+  };
+
   // 지도 위에 배치된 디바이스 드래그 시작
   const handlePlacedDeviceDragStart = (
     deviceId: string,
@@ -264,6 +818,18 @@ export default function HasFloors({
       // 폴백: 디바이스 중심점 기준
       dragStartRef.current = { x: 50, y: 50 };
     }
+  };
+
+  // 이름과 타입으로 deviceId를 찾는 헬퍼 함수 (컴포넌트 레벨)
+  const findDeviceId = (name: string, type: "robot" | "sensor"): string => {
+    const deviceType = type === "robot" ? DeviceType.ROBOT : DeviceType.SENSOR;
+    const found = allDevicesFromAPI.find(
+      (d) => d.name === name && d.type === deviceType
+    );
+    if (found) {
+      return found.deviceId;
+    }
+    return ""; // deviceId를 찾을 수 없으면 빈 문자열 반환
   };
 
   // 마우스 이동 및 드롭 처리
@@ -310,6 +876,14 @@ export default function HasFloors({
           const x = (relativeX - mapOffset.x) / scale;
           const y = (relativeY - mapOffset.y) / scale;
 
+          console.log(`🖱️ [hasmap] 드래그 중 위치 계산:`);
+          console.log(`  마우스 위치: (${e.clientX}, ${e.clientY})`);
+          console.log(`  지도 영역: left=${mapInnerLeft}, top=${mapInnerTop}`);
+          console.log(`  상대 좌표: (${relativeX}, ${relativeY})`);
+          console.log(`  mapOffset: (${mapOffset.x}, ${mapOffset.y})`);
+          console.log(`  scale: ${scale}`);
+          console.log(`  최종 지도 좌표: x=${x.toFixed(2)}, y=${y.toFixed(2)}`);
+
           // 이미 배치된 디바이스인지 확인
           const existingIndex = placedDevices.findIndex(
             (d) => d.id === draggedDeviceId
@@ -317,15 +891,27 @@ export default function HasFloors({
 
           if (existingIndex >= 0) {
             // 위치 업데이트
+            console.log(
+              `  ✅ 기존 디바이스 위치 업데이트: ${draggedDeviceId} -> (${x.toFixed(2)}, ${y.toFixed(2)})`
+            );
             setPlacedDevices((prev) =>
               prev.map((d, idx) => (idx === existingIndex ? { ...d, x, y } : d))
             );
           } else {
             // 새로 배치
+            console.log(
+              `  ✅ 새 디바이스 배치: ${device.id} -> (${x.toFixed(2)}, ${y.toFixed(2)})`
+            );
+            // deviceId 찾기 (컴포넌트 레벨의 findDeviceId 사용)
+            const actualDeviceId = findDeviceId(device.name, device.type);
+            console.log(
+              `  🔑 새 디바이스 deviceId: ${actualDeviceId || device.id}`
+            );
             setPlacedDevices((prev) => [
               ...prev,
               {
                 id: device.id,
+                deviceId: actualDeviceId || device.id, // deviceId를 찾을 수 없으면 id 사용
                 name: device.name,
                 type: device.type,
                 x,
@@ -337,7 +923,51 @@ export default function HasFloors({
       }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = async () => {
+      if (isDraggingDevice && draggedDeviceId) {
+        // 드롭 시 현재 위치의 디바이스 찾기
+        const placedDevice = placedDevices.find(
+          (d) => d.id === draggedDeviceId
+        );
+        if (placedDevice) {
+          console.log("📍 [hasmap] 디바이스 위치 저장:");
+          console.log(`  디바이스 ID: ${placedDevice.id}`);
+          console.log(`  이름: ${placedDevice.name}`);
+          console.log(`  타입: ${placedDevice.type}`);
+          console.log(`  X 좌표: ${placedDevice.x}`);
+          console.log(`  Y 좌표: ${placedDevice.y}`);
+          console.log(`  층 ID: ${selectedFloorId}`);
+          console.log(`  건물 ID: ${buildingId}`);
+          console.log(
+            `  📤 전송할 데이터: { location: { buildingId: "${buildingId}", floorId: "${selectedFloorId}", x: ${placedDevice.x}, y: ${placedDevice.y} } }`
+          );
+
+          // 서버에 위치 저장 (x, y만 전송) - 실제 deviceId 사용
+          const deviceIdToUse = placedDevice.deviceId || placedDevice.id;
+          console.log(
+            `  🔑 [hasmap] 사용할 deviceId: ${deviceIdToUse} (placedDevice.deviceId: ${placedDevice.deviceId}, placedDevice.id: ${placedDevice.id})`
+          );
+          try {
+            await updateDevice(deviceIdToUse, {
+              location: {
+                buildingId: buildingId,
+                floorId: selectedFloorId,
+                x: placedDevice.x,
+                y: placedDevice.y,
+              },
+            });
+            console.log("✅ [hasmap] 디바이스 위치 서버에 저장 완료");
+          } catch (error) {
+            console.error("❌ [hasmap] 디바이스 위치 저장 실패:", error);
+            console.error(`  실패한 deviceId: ${deviceIdToUse}`);
+          }
+        } else {
+          console.warn(
+            `⚠️ [hasmap] 드롭한 디바이스(${draggedDeviceId})를 placedDevices에서 찾을 수 없습니다.`
+          );
+          console.log("현재 placedDevices:", placedDevices);
+        }
+      }
       setIsDraggingDevice(false);
       setDraggedDeviceId(null);
     };
@@ -351,17 +981,28 @@ export default function HasFloors({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDraggingDevice, draggedDeviceId, zoomLevel, mapOffset, placedDevices]);
+  }, [
+    isDraggingDevice,
+    draggedDeviceId,
+    zoomLevel,
+    mapOffset,
+    placedDevices,
+    selectedFloorId,
+    buildingId,
+    devices,
+    allDevicesFromAPI,
+  ]);
 
-  // 선택된 floor의 이름 가져오기
+  // 선택된 floor의 이름 가져오기 (렌더링용)
   const selectedFloor = floors.find((floor) => floor.id === selectedFloorId);
-  const selectedFloorName = selectedFloor?.name || floors[0]?.name || "1층";
+  const displayFloorName =
+    selectedFloor?.name || selectedFloorName || floors[0]?.name || "1층";
 
   return (
     <MainLayout backgroundVariant="gray">
       <div className={s.container}>
         <div className={s.sub_function_header}>
-          <Filter FloorName={selectedFloorName} onToggle={setIsFilterOpen} />
+          <Filter FloorName={displayFloorName} onToggle={setIsFilterOpen} />
           <Scale
             scale={zoomLevel}
             onZoomIn={handleZoomIn}
@@ -375,7 +1016,13 @@ export default function HasFloors({
               selectedFloorId={selectedFloorId}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
-              onFloorSelect={setSelectedFloorId}
+              onFloorSelect={(floorId) => {
+                setSelectedFloorId(floorId);
+                const floor = floors.find((f) => f.id === floorId);
+                if (floor) {
+                  setSelectedFloorName(floor.name);
+                }
+              }}
               onAddFloor={() => {
                 navigate("/map/register/section1");
               }}
@@ -427,6 +1074,7 @@ export default function HasFloors({
                     onZoomLevelChange={setZoomLevel}
                     placedDevices={placedDevices}
                     onDeviceDragStart={handlePlacedDeviceDragStart}
+                    onDeviceClick={handleDeviceClick}
                     mapOffset={mapOffset}
                     onMapOffsetChange={setMapOffset}
                   />
@@ -470,6 +1118,18 @@ export default function HasFloors({
       </div>
       {isMapSettingsOpen && (
         <MapSettings onClose={() => setIsMapSettingsOpen(false)} />
+      )}
+
+      {isDeviceDetailOpen && selectedDevice && (
+        <div className={s.detailOverlay} onClick={handleCloseDeviceDetail}>
+          <div className={s.detailModal} onClick={(e) => e.stopPropagation()}>
+            <RobotDetail
+              deviceId={selectedDevice.deviceId}
+              onClose={handleCloseDeviceDetail}
+              onUpdate={handleDeviceUpdate}
+            />
+          </div>
+        </div>
       )}
     </MainLayout>
   );

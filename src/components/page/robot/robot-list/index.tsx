@@ -70,9 +70,17 @@ const mapDeviceToRobotItem = (device: DeviceDto) => {
   const deviceType =
     device.type === DeviceType.ROBOT ? "소화 로봇" : "화재 감지기";
 
+  // 화재감지기일 때는 name에서 tuya 키 부분 제거
+  const rawName = device.name || "이름 없음";
+  const isSensor = device.type === DeviceType.SENSOR;
+  const name =
+    isSensor && rawName.includes("-tuya-key-")
+      ? rawName.split("-tuya-key-")[0]
+      : rawName;
+
   return {
     image: "/sample/fire-robot.svg", // 기본 이미지
-    name: device.name || "이름 없음",
+    name: name,
     type: deviceType,
     status: robotStatus,
     statusIcon,

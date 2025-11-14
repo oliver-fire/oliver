@@ -4,6 +4,7 @@ import DeviceItem from "@/components/page/map/device";
 
 interface PlacedDevice {
   id: string;
+  deviceId?: string; // 실제 API 요청에 사용할 deviceId
   name: string;
   type: "robot" | "sensor";
   x: number;
@@ -16,6 +17,7 @@ interface MapAreaProps {
   onZoomLevelChange: (zoomLevel: number) => void;
   placedDevices?: PlacedDevice[];
   onDeviceDragStart?: (deviceId: string, e: React.MouseEvent) => void;
+  onDeviceClick?: (deviceId: string) => void;
   onMapOffsetChange?: (offset: { x: number; y: number }) => void;
   mapOffset?: { x: number; y: number };
   showBorder?: boolean;
@@ -27,10 +29,12 @@ export default function MapArea({
   onZoomLevelChange,
   placedDevices = [],
   onDeviceDragStart,
+  onDeviceClick,
   onMapOffsetChange,
   mapOffset: externalMapOffset,
   showBorder = true,
 }: MapAreaProps) {
+  const [dragStartPos, setDragStartPos] = useState<{ x: number; y: number } | null>(null);
   const [internalMapOffset, setInternalMapOffset] = useState({ x: 0, y: 0 });
   const [isMapDragging, setIsMapDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
@@ -135,9 +139,38 @@ export default function MapArea({
                 }}
                 onMouseDown={(e) => {
                   e.stopPropagation();
+                  const startPos = { x: e.clientX, y: e.clientY };
+                  setDragStartPos(startPos);
                   if (onDeviceDragStart) {
                     onDeviceDragStart(device.id, e);
                   }
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // 드래그가 아닌 클릭인지 확인 (이동 거리가 작으면 클릭)
+                  if (dragStartPos) {
+                    const moveDistance = Math.sqrt(
+                      Math.pow(e.clientX - dragStartPos.x, 2) +
+                      Math.pow(e.clientY - dragStartPos.y, 2)
+                    );
+                    console.log("🖱️ [MapArea] 디바이스 클릭:", {
+                      deviceId: device.deviceId || device.id,
+                      moveDistance,
+                      isClick: moveDistance < 5,
+                    });
+                    if (moveDistance < 5 && onDeviceClick) {
+                      // deviceId가 있으면 deviceId 사용, 없으면 id 사용
+                      const deviceIdToUse = device.deviceId || device.id;
+                      console.log("✅ [MapArea] onDeviceClick 호출:", deviceIdToUse);
+                      onDeviceClick(deviceIdToUse);
+                    }
+                  } else if (onDeviceClick) {
+                    // dragStartPos가 없어도 클릭 이벤트 처리
+                    const deviceIdToUse = device.deviceId || device.id;
+                    console.log("✅ [MapArea] onDeviceClick 호출 (dragStartPos 없음):", deviceIdToUse);
+                    onDeviceClick(deviceIdToUse);
+                  }
+                  setDragStartPos(null);
                 }}
               >
                 <DeviceItem
@@ -167,9 +200,38 @@ export default function MapArea({
                 }}
                 onMouseDown={(e) => {
                   e.stopPropagation();
+                  const startPos = { x: e.clientX, y: e.clientY };
+                  setDragStartPos(startPos);
                   if (onDeviceDragStart) {
                     onDeviceDragStart(device.id, e);
                   }
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // 드래그가 아닌 클릭인지 확인 (이동 거리가 작으면 클릭)
+                  if (dragStartPos) {
+                    const moveDistance = Math.sqrt(
+                      Math.pow(e.clientX - dragStartPos.x, 2) +
+                      Math.pow(e.clientY - dragStartPos.y, 2)
+                    );
+                    console.log("🖱️ [MapArea] 디바이스 클릭:", {
+                      deviceId: device.deviceId || device.id,
+                      moveDistance,
+                      isClick: moveDistance < 5,
+                    });
+                    if (moveDistance < 5 && onDeviceClick) {
+                      // deviceId가 있으면 deviceId 사용, 없으면 id 사용
+                      const deviceIdToUse = device.deviceId || device.id;
+                      console.log("✅ [MapArea] onDeviceClick 호출:", deviceIdToUse);
+                      onDeviceClick(deviceIdToUse);
+                    }
+                  } else if (onDeviceClick) {
+                    // dragStartPos가 없어도 클릭 이벤트 처리
+                    const deviceIdToUse = device.deviceId || device.id;
+                    console.log("✅ [MapArea] onDeviceClick 호출 (dragStartPos 없음):", deviceIdToUse);
+                    onDeviceClick(deviceIdToUse);
+                  }
+                  setDragStartPos(null);
                 }}
               >
                 <DeviceItem

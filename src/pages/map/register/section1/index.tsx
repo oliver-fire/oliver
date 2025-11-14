@@ -42,6 +42,7 @@ export default function MapRegisterSection1() {
       await createBuildingFloor({
         level: nextLevel,
         name: buildingName,
+        address: address,
       });
 
       navigate("/map/register/section2");
