@@ -500,6 +500,19 @@ export default function HasFloors({
             "✅ [hasmap] getAllDevices로 전체 디바이스 가져옴:",
             devicesFromAPIForMapping.length
           );
+
+          // 센서 디바이스 확인
+          const sensors = devicesFromAPIForMapping.filter(
+            (d) => d.type === DeviceType.SENSOR
+          );
+          console.log(
+            `📊 [hasmap] 전체 디바이스 중 센서 수: ${sensors.length}`
+          );
+          sensors.forEach((sensor, idx) => {
+            console.log(
+              `  [센서 ${idx + 1}] deviceId: ${sensor.deviceId}, name: "${sensor.name}", floorId: "${sensor.location?.floorId}", floorName: "${sensor.location?.floorName}"`
+            );
+          });
         } catch (allDevicesError) {
           console.error(
             "❌ [hasmap] getAllDevices 호출 실패:",
@@ -508,23 +521,50 @@ export default function HasFloors({
         }
 
         // 이름과 타입으로 deviceId를 찾는 헬퍼 함수 (로컬 변수 사용)
+        // 센서의 경우 name에 tuya-key가 포함될 수 있으므로 유연하게 매칭
         const findDeviceIdLocal = (
           name: string,
           type: "robot" | "sensor"
         ): string => {
           const deviceType =
             type === "robot" ? DeviceType.ROBOT : DeviceType.SENSOR;
-          const found = devicesFromAPIForMapping.find(
+
+          // 정확한 name 일치로 먼저 찾기
+          let found = devicesFromAPIForMapping.find(
             (d: DeviceDto) => d.name === name && d.type === deviceType
           );
+
+          // 센서의 경우 name에 tuya-key가 포함될 수 있으므로 유연하게 매칭
+          if (!found && type === "sensor") {
+            // name에서 tuya-key 부분 제거한 후 비교
+            const nameWithoutTuya = name.includes("-tuya-key-")
+              ? name.split("-tuya-key-")[0]
+              : name;
+
+            found = devicesFromAPIForMapping.find((d: DeviceDto) => {
+              if (d.type !== deviceType) return false;
+              const dNameWithoutTuya = d.name.includes("-tuya-key-")
+                ? d.name.split("-tuya-key-")[0]
+                : d.name;
+              return dNameWithoutTuya === nameWithoutTuya || d.name === name;
+            });
+          }
+
           if (found) {
             console.log(
               `  🔍 [hasmap] deviceId 찾음: 이름="${name}", 타입="${type}" -> deviceId="${found.deviceId}"`
             );
             return found.deviceId;
           }
+
           console.warn(
             `  ⚠️ [hasmap] deviceId를 찾을 수 없음: 이름="${name}", 타입="${type}"`
+          );
+          console.warn(
+            `  📋 [hasmap] 매칭 시도한 디바이스 목록:`,
+            devicesFromAPIForMapping
+              .filter((d) => d.type === deviceType)
+              .map((d) => `"${d.name}"`)
           );
           return ""; // deviceId를 찾을 수 없으면 빈 문자열 반환
         };
@@ -543,12 +583,32 @@ export default function HasFloors({
             `📊 [hasmap] 대시보드 API에서 가져온 기기 수: ${dashboardResponse.data.length}`
           );
 
+          // 센서와 로봇 개수 확인 (firesensor도 센서로 카운트)
+          const robotCount = dashboardResponse.data.filter(
+            (d) => d.type === "robot"
+          ).length;
+          const sensorCount = dashboardResponse.data.filter(
+            (d) => d.type === "sensor" || (d.type as string) === "firesensor"
+          ).length;
+          console.log(
+            `📊 [hasmap] 대시보드 API - 로봇: ${robotCount}개, 센서: ${sensorCount}개`
+          );
+
           dashboardResponse.data.forEach((device, index) => {
             const x = device.location?.x ?? 0;
             const y = device.location?.y ?? 0;
 
+            // API에서 "firesensor"로 오는 경우 "sensor"로 변환
+            const deviceTypeStr = device.type as string;
+            const normalizedType =
+              deviceTypeStr === "firesensor" || deviceTypeStr === "sensor"
+                ? "sensor"
+                : deviceTypeStr === "robot"
+                  ? "robot"
+                  : "robot"; // 기본값
+
             console.log(
-              `  [${index + 1}] robotId: ${device.robotId}, 이름: ${device.name}, 타입: ${device.type}`
+              `  [${index + 1}] robotId: ${device.robotId}, 이름: ${device.name}, 타입: ${device.type} -> 정규화: ${normalizedType}`
             );
             console.log(
               `      📍 위치 정보: x=${x}, y=${y}, location 객체:`,
@@ -558,27 +618,34 @@ export default function HasFloors({
               `      ✅ x가 0이 아님: ${x !== 0}, y가 0이 아님: ${y !== 0}`
             );
 
-            // 실제 deviceId 찾기
-            const actualDeviceId = findDeviceIdLocal(device.name, device.type);
+            // 실제 deviceId 찾기 (정규화된 타입 사용)
+            const actualDeviceId = findDeviceIdLocal(
+              device.name,
+              normalizedType as "robot" | "sensor"
+            );
             console.log(
               `      🔑 실제 deviceId: ${actualDeviceId || "(찾을 수 없음)"}`
             );
 
-            // Device 목록에 추가
+            // Device 목록에 추가 (정규화된 타입 사용)
             allDevices.push({
               id: device.robotId.toString(),
               name: getDisplayName(
                 device.name,
-                device.type === "robot" ? DeviceType.ROBOT : DeviceType.SENSOR
+                normalizedType === "robot"
+                  ? DeviceType.ROBOT
+                  : DeviceType.SENSOR
               ),
-              type: device.type,
+              type: normalizedType as "robot" | "sensor",
             });
 
-            // x, y 좌표가 있으면 placedDevices에 추가
+            // x, y 좌표가 있고 (0, 0)이 아니면 placedDevices에 추가 (정규화된 타입 사용)
+            // (0, 0)은 배치되지 않은 것으로 간주하여 "할당 필요 로봇" 섹션에 표시
             if (
               device.location &&
               device.location.x !== undefined &&
-              device.location.y !== undefined
+              device.location.y !== undefined &&
+              !(device.location.x === 0 && device.location.y === 0)
             ) {
               console.log(
                 `      ✅ placedDevices에 추가: robotId=${device.robotId}, deviceId=${actualDeviceId}, x=${device.location.x}, y=${device.location.y}`
@@ -588,15 +655,17 @@ export default function HasFloors({
                 deviceId: actualDeviceId || device.robotId.toString(), // deviceId를 찾을 수 없으면 robotId 사용
                 name: getDisplayName(
                   device.name,
-                  device.type === "robot" ? DeviceType.ROBOT : DeviceType.SENSOR
+                  normalizedType === "robot"
+                    ? DeviceType.ROBOT
+                    : DeviceType.SENSOR
                 ),
-                type: device.type,
+                type: normalizedType as "robot" | "sensor",
                 x: device.location.x,
                 y: device.location.y,
               });
             } else {
               console.log(
-                `      ⚠️ 위치 정보 없음 - placedDevices에 추가하지 않음`
+                `      ⚠️ 위치 정보 없음 또는 (0, 0) - placedDevices에 추가하지 않음 (할당 필요 섹션에 표시됨)`
               );
             }
           });

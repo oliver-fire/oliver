@@ -105,7 +105,7 @@ interface BuildingFloorRobotResponse {
 interface DashboardFloorDeviceResponse {
   robotId: number;
   name: string;
-  type: "robot" | "sensor";
+  type: "robot" | "sensor" | "firesensor";
   status: string;
   location: {
     x: number;
