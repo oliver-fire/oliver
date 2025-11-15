@@ -33,7 +33,7 @@ export default function CameraItem({
         )}
       </div>
       <div className={s.robotInfo}>
-        <img src="/sample/fire-robot.svg" alt="로봇" className={s.robotIcon} />
+        <img src="/sample/oliver.png" alt="로봇" className={s.robotIcon} />
         <p className={s.robotName}>{robotName}</p>
       </div>
     </div>

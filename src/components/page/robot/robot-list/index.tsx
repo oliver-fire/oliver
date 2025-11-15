@@ -79,7 +79,7 @@ const mapDeviceToRobotItem = (device: DeviceDto) => {
       : rawName;
 
   return {
-    image: "/sample/fire-robot.svg", // 기본 이미지
+    image: isSensor ? "/sample/sensor.jpg" : "/sample/oliver.png",
     name: name,
     type: deviceType,
     status: robotStatus,

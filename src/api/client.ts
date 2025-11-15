@@ -12,7 +12,7 @@ class ApiError extends Error {
     public url: string,
     public method: string,
     public statusCode?: number,
-    public responseData?: unknown,
+    public responseData?: unknown
   ) {
     super(message);
     this.name = "ApiError";
@@ -52,17 +52,22 @@ const getToken = (): string | null => {
 
   const cookieToken = getCookie("accessToken");
   const localStorageToken = localStorage.getItem("accessToken");
-  
+
   const token = cookieToken || localStorageToken;
-  
+
   tokenCache = token;
   cacheTimestamp = now;
 
   return token;
 };
 
-const isLocal = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-const baseURL = isLocal ? "https://oliver-api-staging.thnos.app" : "https://oliver-api.thnos.app";
+const isLocal =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1");
+const baseURL = isLocal
+  ? "https://oliver-api-staging.thnos.app"
+  : "https://oliver-api.thnos.app";
 
 export const apiClient = axios.create({
   baseURL,
@@ -81,6 +86,9 @@ apiClient.interceptors.request.use(
     console.log("Method:", config.method?.toUpperCase());
     console.log("Token:", token ? `${token.substring(0, 20)}...` : "없음");
     console.log("Full Token:", token);
+    if (config.data) {
+      console.log("Request Data:", JSON.stringify(config.data, null, 2));
+    }
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -92,7 +100,7 @@ apiClient.interceptors.request.use(
     const apiError = new ApiError(
       `API Request Error: ${error.message}`,
       url,
-      method,
+      method
     );
 
     // Sentry에 요청 에러 기록 (커스텀 에러 사용으로 스택 트레이스 단순화)
@@ -114,7 +122,7 @@ apiClient.interceptors.request.use(
       fingerprint: ["api-request-error", url, method],
     });
     throw apiError;
-  },
+  }
 );
 
 apiClient.interceptors.response.use(
@@ -124,23 +132,31 @@ apiClient.interceptors.response.use(
     console.log("Status:", response.status);
     console.log("Data:", response.data);
     console.log("Response Headers:", response.headers);
-    
+
     // Set-Cookie 헤더 확인
-    const setCookieHeader = response.headers["set-cookie"] || response.headers["Set-Cookie"];
+    const setCookieHeader =
+      response.headers["set-cookie"] || response.headers["Set-Cookie"];
     if (setCookieHeader) {
       console.log("✅ Set-Cookie 헤더 받음:", setCookieHeader);
     } else {
       console.log("⚠️ Set-Cookie 헤더 없음");
     }
-    
+
     return response;
   },
   (error: AxiosError) => {
     console.error("=== API Error ===");
     console.error("URL:", error.config?.url);
+    console.error("Method:", error.config?.method?.toUpperCase());
     console.error("Status:", error.response?.status);
-    console.error("Error Data:", error.response?.data);
+    console.error("Error Data:", JSON.stringify(error.response?.data, null, 2));
     console.error("Error Message:", error.message);
+    if (error.config?.data) {
+      console.error(
+        "Request Data that caused error:",
+        JSON.stringify(JSON.parse(error.config.data), null, 2)
+      );
+    }
 
     const url = error.config?.url || "unknown";
     const method = error.config?.method?.toUpperCase() || "unknown";
@@ -162,7 +178,7 @@ apiClient.interceptors.response.use(
       url,
       method,
       statusCode,
-      responseData,
+      responseData
     );
 
     // Sentry에 API 응답 에러 상세 기록
@@ -201,7 +217,7 @@ apiClient.interceptors.response.use(
     });
 
     throw apiError;
-  },
+  }
 );
 
 export default apiClient;

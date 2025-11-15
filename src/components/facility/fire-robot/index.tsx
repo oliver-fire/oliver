@@ -114,7 +114,7 @@ export default function FireRobotItem({
     >
       <div className={s.left}>
         <img
-          src="/sample/fire-robot.svg"
+          src="/sample/oliver.png"
           alt="소방 로봇"
           className={s.robotImage}
         />

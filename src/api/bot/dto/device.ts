@@ -77,6 +77,8 @@ export interface RegisterSensorDto {
   floorId: string;
   name: string;
   tuyaDeviceRegisterKey?: string;
+  x?: number;
+  y?: number;
 }
 
 export interface RegisterSuccessResponseDto {

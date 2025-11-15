@@ -433,6 +433,8 @@ export const registerSensorsSequentially = async (): Promise<DeviceDto[]> => {
         floorId: "", // 공백 문자열
         tuyaDeviceRegisterKey: "tuya-key-12345", // 고정 키 값
         name: "Sensor",
+        x: 0,
+        y: 0,
       };
 
       const registeredSensor = await registerSensor(registerData);

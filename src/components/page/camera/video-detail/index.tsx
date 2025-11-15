@@ -38,11 +38,7 @@ export default function VideoDetail({ isOpen, onClose, videoInfo }: Props) {
 
         <div className={s.bottomBar}>
           <div className={s.leftSection}>
-            <img
-              src="/sample/fire-robot.svg"
-              alt="로봇"
-              className={s.robotIcon}
-            />
+            <img src="/sample/oliver.png" alt="로봇" className={s.robotIcon} />
             <div className={s.textGroup}>
               <div className={s.mainText}>로봇 카메라 상세</div>
               <div className={s.subText}>{status}</div>
@@ -51,7 +47,7 @@ export default function VideoDetail({ isOpen, onClose, videoInfo }: Props) {
 
           <div className={s.centerSection}>
             <img
-              src="/sample/fire-robot.svg"
+              src="/sample/oliver.png"
               alt="소방 로봇"
               className={s.robotIcon}
             />

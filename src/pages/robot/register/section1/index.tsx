@@ -42,15 +42,15 @@ const SelectType = ({
         <RobotRegisterCard
           title="소화 로봇"
           description="화재가 발생하였을 때 초기 진압을 하는 로봇입니다"
-          image="/sample/fire-robot.svg"
+          image="/sample/oliver.png"
           selected={selectedType === "robot"}
           onSelect={() => onSelect("robot")}
         />
 
         <RobotRegisterCard
-          title="화재 감지기기"
+          title="화재 감지기"
           description="올리버 시스템과 연동되어 화재를 감지합니다"
-          image="/sample/fire-robot.svg"
+          image="/sample/sensor.jpg"
           selected={selectedType === "sensor"}
           onSelect={() => onSelect("sensor")}
         />

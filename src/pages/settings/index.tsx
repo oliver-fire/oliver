@@ -98,6 +98,7 @@ export default function Settings() {
             secondButtonText="안 받을게요"
             icon={Phone}
             placeholder="010-0000-0000"
+            defaultValue="010-5450-9182"
           />
         </div>
         <Button text="저장" onClick={() => {}} />

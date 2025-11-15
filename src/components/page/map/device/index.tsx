@@ -29,7 +29,11 @@ export default function DeviceItem({
       }}
       onMouseDown={draggable ? onDragStart : undefined}
     >
-      <img src={"/sample/fire-robot.svg"} alt={name} className={s.image} />
+      <img
+        src={type === "sensor" ? "/sample/sensor.jpg" : "/sample/oliver.png"}
+        alt={name}
+        className={s.image}
+      />
       <p className={s.name}>{name}</p>
     </div>
   );

@@ -11,6 +11,7 @@ interface Props {
   secondButtonText: string;
   icon: LucideIcon;
   placeholder: string;
+  defaultValue?: string;
 }
 
 export default function Contact({
@@ -19,6 +20,7 @@ export default function Contact({
   secondButtonText,
   icon: Icon,
   placeholder,
+  defaultValue,
 }: Props) {
   const [selected, setSelected] = useState<"first" | "second">("first");
 
@@ -37,7 +39,12 @@ export default function Contact({
 
         <div className={s.phoneInput}>
           <Icon className={s.icon} />
-          <input type="text" placeholder={placeholder} className={s.input} />
+          <input
+            type="text"
+            placeholder={placeholder}
+            className={s.input}
+            defaultValue={defaultValue}
+          />
         </div>
       </div>
     </div>

@@ -11,7 +11,7 @@ export default function BluetoothRobot({ serialNumber = "", name }: Props) {
       <div className={s.smallcontainer}>
         <img
           className={s.image}
-          src="/sample/fire-robot.svg"
+          src="/sample/oliver.png"
           alt="find-robot"
         ></img>
 

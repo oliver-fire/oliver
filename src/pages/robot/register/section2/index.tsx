@@ -78,6 +78,8 @@ const RegisterRobot = ({
             floorId: floorId,
             tuyaDeviceRegisterKey: "tuya-key-12345",
             name: deviceName,
+            x: 0,
+            y: 0,
           };
           console.log(
             "센서 등록 요청 데이터:",

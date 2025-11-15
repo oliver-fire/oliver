@@ -11,7 +11,7 @@ export default function RobotItem({ battery = "", name, type }: Props) {
     <div className={s.smallcontainer}>
       <img
         className={s.img}
-        src="/sample/fire-robot.svg"
+        src="/sample/oliver.png"
         alt="find-robot"
       ></img>
 

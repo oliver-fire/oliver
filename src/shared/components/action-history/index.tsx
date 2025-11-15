@@ -1,6 +1,6 @@
 import { FireExtinguisher, LucideIcon } from "lucide-react";
 
-import d from "../../../../public/sample/fire-robot.svg";
+import d from "../../../../public/sample/oliver.png";
 
 import s from "./styles.module.scss";
 

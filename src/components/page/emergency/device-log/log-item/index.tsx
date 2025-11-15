@@ -27,7 +27,7 @@ export default function LogItem({
 
           <div className={s.ns}>
             <img
-              src="/sample/fire-robot.svg"
+              src="/sample/oliver.png"
               alt="fire-robot"
               className={s.robotImage}
             />
